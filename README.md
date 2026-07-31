@@ -102,14 +102,6 @@ D(العائلة,
 
 ## 📄 الترخيص
 
-انظر ملف [LICENSE](./LICENSE).
-
-</div>
-
----
-
-<div dir="ltr">
-
-> **EN — TL;DR:** A single self-contained `perfumes.html` (no server, no build, no dependencies) listing a curated selection of **men's perfumes**, each paired with a vetted Arabic/economic **alternative**, plus notes, longevity/sillage scores, blind-buy verdicts, instant Arabic-normalized search, family filters, sorting, favorites, and shareable URL state. UI is Arabic RTL. See [AGENTS.md](./AGENTS.md) for the engineering rules before editing.
+هذا المشروع مرخّص وفق رخصة **GNU GPL‑3.0**. انظر ملف [LICENSE](./LICENSE) للنص الكامل.
 
 </div>
