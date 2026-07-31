@@ -1,8 +1,8 @@
 <div dir="rtl">
 
-# موسوعة المئتين · أفضل ٢٠٠ عطر رجالي وبدائلها
+# بديل عطر ٢ · أفضل العطور الرجالية وبدائلها
 
-> دليل تفاعلي واحد يضم **٢٠٠ عطر رجالي** من نخبة التقييمات العالمية، إلى جانب **البديل العربي/الاقتصادي** الموثوق لكل قارورة — مع النوتات العطرية، نسب الثبات والفوحان، وحكم نهائي للشراء الأعمى. مصنّف في **عشر عائلات عطرية** وبحث وفلترة فورية.
+> دليل تفاعلي واحد يضم نخبة **العطور الرجالية** من أعلى التقييمات العالمية، إلى جانب **البديل العربي/الاقتصادي** الموثوق لكل قارورة — مع النوتات العطرية، نسب الثبات والفوحان، وحكم نهائي للشراء الأعمى. مصنّف في **عشر عائلات عطرية** وبحث وفلترة فورية.
 
 ملف واحد (`perfumes.html`) لا يحتاج خادماً ولا خطوة بناء ولا أي اعتماد خارجي — افتحه في المتصفح فقط، ويعمل دون إنترنت بعد التحميل الأول للخطوط.
 
@@ -12,7 +12,7 @@
 
 ## ✨ المزايا
 
-- **مئتا عطر** مُقيَّمة، لكلٍّ منها بديل مُدروس (اسم + دار + نوتات).
+- **عطور مُقيَّمة**، لكلٍّ منها بديل مُدروس (اسم + دار + نوتات).
 - **عشر عائلات عطرية** ملوّنة: خشبية، شرقية عنبرية، حمضية، أروماتيك، مائية، جلدية وتبغ، حارة، زهرية رجالية، جورماند، فوجير.
 - **قوارير SVG مُولَّدة برمجياً** بخمسة أشكال وألوان لكل عائلة — لا صور، لا أصول، حجم صغير.
 - **بحث فوري** مع تطبيع الحروف العربية (التشكيل، ألف/إ/آ، ة/ه، ى/ي، المدّة).
@@ -95,7 +95,7 @@ D(العائلة,
 1. أنشئ فرعاً (مثل `add/perfume-xyz`).
 2. أضِف/عدّل سطر `D(...)` واحفظ UTF-8.
 3. افتح `perfumes.html` وتأكّد من ظهور رسالة الوحدة في الطرفية:
-   `✓ تم تحميل ٢٠٠ عطرًا بنجاح`
+   `✓ تم تحميل العطور بنجاح`
 4. افتح Pull Request.
 
 راجع [AGENTS.md](./AGENTS.md) للقواعد التقنية المفصّلة عند التعديل.
@@ -110,6 +110,6 @@ D(العائلة,
 
 <div dir="ltr">
 
-> **EN — TL;DR:** A single self-contained `perfumes.html` (no server, no build, no dependencies) listing the top **200 men's perfumes**, each paired with a vetted Arabic/economic **alternative**, plus notes, longevity/sillage scores, blind-buy verdicts, instant Arabic-normalized search, family filters, sorting, favorites, and shareable URL state. UI is Arabic RTL. See [AGENTS.md](./AGENTS.md) for the engineering rules before editing.
+> **EN — TL;DR:** A single self-contained `perfumes.html` (no server, no build, no dependencies) listing a curated selection of **men's perfumes**, each paired with a vetted Arabic/economic **alternative**, plus notes, longevity/sillage scores, blind-buy verdicts, instant Arabic-normalized search, family filters, sorting, favorites, and shareable URL state. UI is Arabic RTL. See [AGENTS.md](./AGENTS.md) for the engineering rules before editing.
 
 </div>
