@@ -148,6 +148,13 @@ footer ul{padding-inline-start:18px}
 .fav.on{color:#e0627a;border-color:#e0627a;background:rgba(224,98,122,.14)}
 .fchip[data-cat="fav"] i{background:#e0627a}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.mote{display:none!important}.card,.sech{opacity:1!important;transform:none!important}}
+/* ===== شارات درجة التشابه (التدقيق) ===== */
+.sim{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:800;padding:2px 10px;border-radius:99px;margin-inline-start:auto;white-space:nowrap;line-height:1.6}
+.sim b{font-size:.64rem;font-weight:700;opacity:.8}
+.sim-twin{color:#ffd98a;background:rgba(212,162,78,.15);border:1px solid rgba(232,190,100,.55);box-shadow:0 0 14px rgba(212,162,78,.16)}
+.sim-strong{color:#9fe0c8;background:rgba(85,163,139,.13);border:1px solid rgba(120,200,170,.45)}
+.sim-close{color:#e2bb90;background:rgba(176,120,60,.13);border:1px solid rgba(205,150,90,.4)}
+.sim-vibe{color:#a89a88;background:rgba(140,120,100,.1);border:1px solid rgba(160,140,115,.32)}
 </style>
 </head>
 <body>
@@ -955,6 +962,65 @@ addEventListener('scroll',function(){
  document.getElementById('toTop').classList.toggle('show',h.scrollTop>600);
 },{passive:true});
 document.getElementById('toTop').onclick=function(){scrollTo({top:0,behavior:'smooth'})};
+/* ============================================================
+   نظام درجة التشابه + تدقيق البدائل
+   يعمل تلقائياً بعد أي فرز/فلترة — لا تعديل آخر مطلوب
+   ============================================================ */
+(function(){
+  function normAr(s){return String(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();}
+
+  /* درجة كل بديل — كلما كانت المحاكاة موثقة أكثر ارتفعت */
+  var SIM={
+    /* 🎯 توائم موثقة 88–95 */
+    'باروك روج إكستريه':92,'كلوب دو نوي إنتنس مان':90,'أمبر عود جولد':90,
+    'خمرة':90,'ليو قام':90,'بديع العود أوف جلوري':90,'أسد':88,'٩ بي إم':88,
+    'أمبر عود روبي':88,'جان لو إيمورتال':88,
+    /* ≈ تطابق قوي 80–87 */
+    'فطّان':86,'تراثي بلو':86,'ديتور نوار':86,'بديع العود سبلايم':86,
+    'تريس نوي':85,'كلوب دو نوي سيّاج':85,'فاخر':85,'وودي عود':85,
+    'فنتانا':84,'نجدية':84,'خمرة قهوة':84,'أمبر عود توباكو':84,
+    'كلوب دو نوي أوربان مان':83,'توسكانو ليذر':82,'كلوب دو نوي مايلستون':82,'خمرة دخان':82,
+    'رغبة وود إنتنس':80,'هواس':80,'قائد الفرسان':80,'رمز سيلفر':80,
+    'أمير العود إنتنس':80,'أنا أبيض':80,'فيلفت جولد':80,
+    /* ◐ قريب 74–79 */
+    'هانتر إنتنس':79,'عود مود':78,'أسد زنجبار':78,'رمز جولد':78,'تشوكو مسك':78,'درهم':78,
+    'كورو':76,'تريس جور':76,'أوديسي أوم وايت':76,'ليام غراي':76,'عود مود إكسير':76,
+    'أنا أبيض لذر':76,'عود ٢٤ ساعة':76,'فيتيفر بامبلموس':75,
+    'رغبة':74,'نجدية تريبيوت':74,'ثروة جولد':74,'أوبولنت مسك':74,
+    /* 🌫 بروح مشابهة — البدائل الفضفاضة (نتيجة التدقيق) */
+    'إعجازي':72,'حياتي':72,'ثروة سيلفر':72,'ماهر ليغاسي':72,'ليام بلو شاين':72,
+    'أوديسي ميغا':72,'ماهر':72,'شادو':70,'أريستوقراط':70
+  };
+  var SIMN={};for(var k in SIM){SIMN[normAr(k)]=SIM[k];}
+
+  function tierOf(sc){
+    if(sc>=88)return{t:'🎯 توأم موثق',c:'sim-twin'};
+    if(sc>=80)return{t:'≈ تطابق قوي',c:'sim-strong'};
+    if(sc>=74)return{t:'◐ قريب',c:'sim-close'};
+    return{t:'🌫 بروح مشابهة',c:'sim-vibe'};
+  }
+
+  data.forEach(function(d){var sc=SIMN[normAr(d.an)];d.sim=(sc==null?75:sc);});
+
+  var AR='٠١٢٣٤٥٦٧٨٩',arN=function(n){return String(n).replace(/\d/g,function(x){return AR[x];});};
+
+  function badge(card){
+    if(card.querySelector('.sim'))return;
+    var i=+card.getAttribute('data-i');if(isNaN(i)||!data[i])return;
+    var head=card.querySelector('.alt-head')||card.querySelector('.altblock');if(!head)return;
+    var t=tierOf(data[i].sim),el=document.createElement('span');
+    el.className='sim '+t.c;el.title='درجة تشابه البديل مع الأصلي';
+    el.innerHTML=t.t+' <b>'+arN(data[i].sim)+'٪</b>';
+    head.appendChild(el);
+  }
+  function injectAll(){var c=document.querySelectorAll('.card');for(var j=0;j<c.length;j++)badge(c[j]);}
+  injectAll();
+
+  var pending=false;
+  new MutationObserver(function(){if(pending)return;pending=true;
+    requestAnimationFrame(function(){pending=false;injectAll();});
+  }).observe(document.getElementById('main')||document.body,{childList:true,subtree:true});
+})();
 console.log('✓ تم تحميل العطور بنجاح');
 }catch(err){
  var b=document.createElement('div');b.className='errbar';
