@@ -185,9 +185,12 @@ footer ul{padding-inline-start:18px}
     <option value="pf">الأطول ثباتاً</option>
     <option value="ps">الأقوى فوحاناً</option>
     <option value="price">السعر (الأرخص أولاً)</option>
-    <option value="name">أبجدياً (أ‑ي)</option>
-   </select>
-   <span class="count" id="count"></span>
+     <option value="name">أبجدياً (أ‑ي)</option>
+    </select>
+    <select id="brand" class="sortsel" aria-label="فلتر بحسب الدار المنتجة">
+     <option value="all">كل الدور</option>
+    </select>
+    <span class="count" id="count"></span>
  </div>
  <div class="chips-row" id="chips"></div>
 </div>
@@ -874,6 +877,14 @@ var chipsBox=document.getElementById('chips');
 chipsBox.innerHTML='<button class="fchip on" data-cat="all" style="--cc:#d4a24e"><i></i>الكل · '+arN(data.length)+'</button>'
  +Object.keys(CATS).map(function(k){return '<button class="fchip" data-cat="'+k+'" style="--cc:'+CATS[k].c+'"><i></i>'+CATS[k].n+'</button>'}).join('')
  +'<button class="fchip" data-cat="fav" style="--cc:#e0627a"><i></i>♡ المفضلة <span id="favc">٠</span></button>';
+var brandSel=document.getElementById('brand'),brandSet={};
+(function(){
+ var seen={},barOf={};
+ data.forEach(function(d){seen[d.br]=(seen[d.br]||0)+1;barOf[d.br]=d.bar});
+ brandSet=seen;
+ var arr=Object.keys(seen).sort(function(a,b){return barOf[a].localeCompare(barOf[b],'ar')});
+ brandSel.insertAdjacentHTML('beforeend',arr.map(function(br){return '<option value="'+br+'">'+barOf[br]+' · '+arN(seen[br])+'</option>'}).join(''));
+})();
 function norm(s){return s.toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي')}
 var hay=data.map(function(d){return norm([d.n,d.en,d.br,d.bar,d.an,d.abr,d.abar,CATS[d.c].n].concat(d.notes,d.anotes).join(' '))});
 var curCat='all';
@@ -886,8 +897,9 @@ function saveState(){
  if(curCat!=='all')p.push('cat='+curCat);
  var t=q.value.trim();if(t)p.push('q='+encodeURIComponent(t));
  if(blindOnly.checked)p.push('blind=1');
- if(sortSel.value!=='rank')p.push('sort='+sortSel.value);
- if(favChip.classList.contains('on'))p.push('fav=1');
+  if(sortSel.value!=='rank')p.push('sort='+sortSel.value);
+  if(brandSel.value!=='all')p.push('brand='+encodeURIComponent(brandSel.value));
+  if(favChip.classList.contains('on'))p.push('fav=1');
  var h=p.length?'#'+p.join('&'):'';
  if((h||'#')!==location.hash)history.replaceState(null,'',h||location.pathname+location.search);
 }
@@ -896,15 +908,16 @@ function loadState(){
  if(kv.cat&&CATS[kv.cat]){curCat=kv.cat}
  if(typeof kv.q==='string'){q.value=kv.q}
  if(kv.blind==='1'){blindOnly.checked=true}
- if(['rank','rate','pf','ps','price','name'].indexOf(kv.sort)>-1){sortSel.value=kv.sort}
- if(kv.fav==='1'){favChip.classList.add('on')}
+  if(['rank','rate','pf','ps','price','name'].indexOf(kv.sort)>-1){sortSel.value=kv.sort}
+  if(typeof kv.brand==='string'&&brandSet[kv.brand]){brandSel.value=kv.brand}else{brandSel.value='all'}
+  if(kv.fav==='1'){favChip.classList.add('on')}
 }
 function syncChips(){chipsBox.querySelectorAll('.fchip').forEach(function(x){if(x.dataset.cat!=='fav')x.classList.toggle('on',x.dataset.cat===curCat)})}
 function apply(){
- var term=norm(q.value.trim()),vis=0,sortMode=sortSel.value,favOnly=favChip.classList.contains('on');
+ var term=norm(q.value.trim()),vis=0,sortMode=sortSel.value,favOnly=favChip.classList.contains('on'),curBrand=brandSel.value;
  document.querySelectorAll('.card').forEach(function(el){
   var i=+el.dataset.i;
-  var ok=(curCat==='all'||el.dataset.cat===curCat)&&(!term||hay[i].indexOf(term)>-1)&&(!blindOnly.checked||data[i].bla)&&(!favOnly||favs.has(i));
+  var ok=(curCat==='all'||el.dataset.cat===curCat)&&(curBrand==='all'||data[i].br===curBrand)&&(!term||hay[i].indexOf(term)>-1)&&(!blindOnly.checked||data[i].bla)&&(!favOnly||favs.has(i));
   el.style.display=ok?'':'none';if(ok)vis++;
  });
  document.querySelectorAll('.grid').forEach(function(grid){
@@ -926,7 +939,7 @@ function apply(){
  countEl.textContent='يعرض '+arN(vis)+' من '+arN(data.length)+' عطر ✓';
  saveState();
 }
-q.addEventListener('input',apply);blindOnly.addEventListener('change',apply);sortSel.addEventListener('change',apply);
+q.addEventListener('input',apply);blindOnly.addEventListener('change',apply);sortSel.addEventListener('change',apply);brandSel.addEventListener('change',apply);
 main.addEventListener('click',function(e){
  var b=e.target.closest('[data-fav]');if(!b)return;e.preventDefault();
  var i=+b.dataset.fav;
