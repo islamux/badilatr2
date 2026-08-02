@@ -59,7 +59,7 @@ h1 span{color:var(--gold);text-shadow:0 0 30px rgba(212,162,78,.45)}
 .toolbar{position:sticky;top:0;z-index:50;background:rgba(20,13,7,.92);backdrop-filter:blur(10px);border-block:1px solid var(--line);padding:12px 22px;margin-top:26px}
 .trow{max-width:1280px;margin:auto;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 .search{flex:1;min-width:230px;position:relative}
-.search input{width:100%;background:#241811;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:10px 14px;padding-inline-start:40px;font:inherit;font-size:.9rem;transition:.3s}
+.search input{width:100%;background:#241811;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding-block:10px;padding-inline:40px 36px;font:inherit;font-size:.9rem;transition:.3s}
 .search input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,162,78,.15)}
 .search::before{content:'🔍';position:absolute;inset-inline-start:13px;top:50%;transform:translateY(-50%);opacity:.55;font-size:.85rem}
 .switch{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--mut);cursor:pointer;user-select:none}
@@ -147,6 +147,50 @@ footer ul{padding-inline-start:18px}
 .fav:hover{color:#e0627a;border-color:#e0627a;transform:scale(1.12)}
 .fav.on{color:#e0627a;border-color:#e0627a;background:rgba(224,98,122,.14)}
 .fchip[data-cat="fav"] i{background:#e0627a}
+/* ===== شريط الأدوات: زر مسح + شارة فلاتر + رقائق نشطة + ورقة سفلية للجوال ===== */
+.qclear{position:absolute;inset-inline-end:9px;top:50%;transform:translateY(-50%);width:24px;height:24px;border:none;border-radius:50%;background:rgba(255,255,255,.07);color:var(--mut);font-size:.78rem;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;transition:.2s}
+.qclear:hover{background:rgba(224,98,122,.22);color:#e0627a}
+.search.has-q .qclear{display:flex}
+.search::after{content:'';position:absolute;inset-block-end:0;inset-inline-start:14px;width:calc(var(--qfill,0)*100%);max-width:calc(100% - 28px);height:2px;background:linear-gradient(90deg,var(--gold),transparent);border-radius:2px;opacity:0;transition:opacity .35s;pointer-events:none}
+.search.has-q::after{opacity:.55}
+.fbadge{display:none;align-items:center;gap:7px;background:#241811;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:10px 14px;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;transition:.25s;flex-shrink:0}
+.fbadge:hover{border-color:var(--gold);color:var(--gold)}
+.fbadge .fgear{font-size:1rem;line-height:1}
+.fdot{display:none;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:var(--gold);color:#171009;font-size:.68rem;font-weight:800;line-height:20px;text-align:center}
+.fbadge.has-f .fdot{display:inline-block}
+.fpanel{display:contents}
+.fpanel-h{display:none}
+.reset{display:none;background:transparent;border:1px solid var(--line);color:var(--mut);border-radius:10px;padding:9px 14px;font:inherit;font-size:.82rem;cursor:pointer;transition:.25s}
+.reset:hover{color:#e0627a;border-color:#e0627a}
+.active{max-width:1280px;margin:9px auto 0;padding:0 22px;display:flex;gap:7px;flex-wrap:wrap}
+.active:empty{margin-top:0}
+.achip{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;background:rgba(212,162,78,.12);border:1px solid rgba(212,162,78,.4);color:#e9d5af;border-radius:99px;padding:4px 6px 4px 12px;cursor:pointer;transition:.2s}
+.achip:hover{background:rgba(224,98,122,.18);border-color:#e0627a;color:#f0c37a}
+.achip i{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.28);font-size:.68rem;line-height:1;font-style:normal}
+.chipbar{max-width:1280px;margin:10px auto 0;padding:0 22px;display:flex;align-items:center;gap:12px}
+.chipbar .chips-row{margin:0;flex:1;min-width:0}
+.chipbar .count{flex-shrink:0}
+.fchip .cn{font-weight:800;opacity:.6;font-size:.7rem}
+.fchip.on .cn{opacity:.95}
+/* --- الجوال: شريط نحيف + لوحة فلاتر منسدلة --- */
+@media(max-width:760px){
+ .toolbar{backdrop-filter:none;background:#140d07;padding:9px 14px}
+ .search{min-width:0}
+ .fbadge{display:inline-flex}
+ .fpanel{display:none;flex:1 1 100%;flex-direction:column;gap:14px;background:#1d140c;border-block-start:1px solid var(--line);padding:14px 14px calc(16px + env(safe-area-inset-bottom));max-height:72vh;overflow:auto}
+ .fpanel.open{display:flex}
+ .fpanel-h{display:flex;align-items:center;justify-content:space-between}
+ .fpanel-h b{font-family:'Aref Ruqaa';font-size:1.3rem;color:var(--gold)}
+ .fpanel-h button{background:none;border:none;color:var(--mut);font-size:1.15rem;cursor:pointer;padding:2px 8px;line-height:1}
+ .fpanel .switch{font-size:.95rem;padding:2px 0}
+ .fpanel .sw{width:44px;height:24px}
+ .fpanel .switch input:checked+.sw::after{inset-inline-start:24px}
+ .fpanel .sortsel{width:100%;padding:13px 14px;font-size:.95rem}
+ .reset{display:inline-flex;align-self:flex-start}
+ .active{padding:0 14px}
+ .chipbar{padding:0 14px;margin-top:8px}
+ .count{font-size:.74rem}
+}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.mote{display:none!important}.card,.sech{opacity:1!important;transform:none!important}}
 /* ===== شارات درجة التشابه (التدقيق) ===== */
 .sim{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:800;padding:2px 10px;border-radius:99px;margin-inline-start:auto;white-space:nowrap;line-height:1.6}
@@ -184,22 +228,29 @@ footer ul{padding-inline-start:18px}
 
 <div class="toolbar">
  <div class="trow">
-  <div class="search"><input id="q" type="text" placeholder="ابحث عن عطر، بديل، نوتة… مثال: عود، فانيليا، لطافة"></div>
-   <label class="switch"><input type="checkbox" id="blindOnly"><span class="sw"></span>بدائل آمنة للشراء الأعمى فقط</label>
+  <div class="search"><input id="q" type="text" placeholder="ابحث عن عطر، بديل، نوتة… مثال: عود، فانيليا، لطافة"><button class="qclear" id="qclear" type="button" aria-label="مسح البحث">✕</button></div>
+  <button class="fbadge" id="fbadge" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="sec">
+   <span class="fgear">⚙</span><span class="ftxt">فلترة</span><span class="fdot" id="fdot">٠</span>
+  </button>
+  <div class="fpanel" id="sec" role="dialog" aria-label="الفلاتر">
+   <div class="fpanel-h"><b>الفلاتِر</b><button type="button" id="secClose" aria-label="إغلاق">✕</button></div>
+   <label class="switch"><input type="checkbox" id="blindOnly"><span class="sw"></span>آمن فقط للشراء الأعمى</label>
    <select id="sort" class="sortsel" aria-label="ترتيب العطور">
     <option value="rank">الترتيب الافتراضي</option>
     <option value="rate">الأعلى تقييماً</option>
     <option value="pf">الأطول ثباتاً</option>
     <option value="ps">الأقوى فوحاناً</option>
     <option value="price">السعر (الأرخص أولاً)</option>
-     <option value="name">أبجدياً (أ‑ي)</option>
-    </select>
-    <select id="brand" class="sortsel" aria-label="فلتر بحسب الدار المنتجة">
-     <option value="all">كل الدور</option>
-    </select>
-    <span class="count" id="count"></span>
+    <option value="name">أبجدياً (أ‑ي)</option>
+   </select>
+   <select id="brand" class="sortsel" aria-label="فلتر بحسب الدار المنتجة">
+    <option value="all">كل الدور</option>
+   </select>
+   <button class="reset" id="reset" type="button">↺ إعادة ضبط الفلاتر</button>
+  </div>
  </div>
- <div class="chips-row" id="chips"></div>
+ <div class="active" id="active"></div>
+ <div class="chipbar"><span class="count" id="count"></span><div class="chips-row" id="chips"></div></div>
 </div>
 
 <main id="main"></main>
@@ -221,7 +272,21 @@ footer ul{padding-inline-start:18px}
 
 <script>
 try{
-var AR='٠١٢٣٤٥٦٧٨٩', arN=function(n){return String(n).replace(/\d/g,function(d){return AR[d]})};
+/* ============================================================
+   App · وحدات منطقية — فصل الاهتمامات داخل ملف واحد
+   كل وحدة IIFE بمسؤولية واحدة وواجهة minim؛ التدفق نازلٌ بلا دورات
+   ============================================================ */
+var App={};
+/* ===== Util: مساعدات مشتركة (مصدر موحّد واحد — يُلغي التكرار) ===== */
+App.Util=(function(){
+ var AR='٠١٢٣٤٥٦٧٨٩';
+ return {
+  arN:function(n){return String(n).replace(/\d/g,function(d){return AR[d]})},
+  norm:function(s){return s.toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي')},
+  normAr:function(s){return String(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim()},
+  priceRank:function(p){return p==='$$'?2:p==='$$$'?3:1}
+ };
+})();
 var CATS={
  woody:{n:'خشبية',d:'صندل وأرز وعود وبتولا — دفء الغابة وهيبة الكلاسيكيات',c:'#b08a4f',c2:'#6e4a22'},
  oriental:{n:'شرقية عنبرية',d:'عنبر وعود وتوابل فاخرة — عطور تترك أثراً لا يُنسى',c:'#b34358',c2:'#5a1f33'},
@@ -795,8 +860,21 @@ var BOOZY=['أنجلز شير','بلاك فانتوم','سترايت تو هيف
 data.forEach(function(d){for(var i=0;i<BOOZY.length;i++){if(d.n.indexOf(BOOZY[i])>-1){d.c='boozy';break;}}});
 var favs=new Set(JSON.parse(localStorage.getItem('p100favs')||'[]'));
 
-/* ====== رسم القوارير (SVG) ====== */
-function bottleBig(idx,c1,c2,code,v){
+/* ============================================================
+   وحدات التطبيق — كل وحدة IIFE بمسؤولية واحدة وواجهة دنيا
+   الترتيب: تعريفات نقيّة أولاً → عرض → منطق → آثار جانبية → إقلاع
+   ============================================================ */
+var main=document.getElementById('main');
+var q=document.getElementById('q'),blindOnly=document.getElementById('blindOnly');
+var sortSel=document.getElementById('sort'),brandSel=document.getElementById('brand');
+var countEl=document.getElementById('count'),emptyEl=document.getElementById('empty');
+var chipsBox=document.getElementById('chips');
+var favChip,brandSet={},brandBar={};
+var searchEl=q.closest('.search'),secEl=document.getElementById('sec'),fbadge=document.getElementById('fbadge'),fdot=document.getElementById('fdot');
+var qclear=document.getElementById('qclear'),resetBtn=document.getElementById('reset'),activeBox=document.getElementById('active'),secClose=document.getElementById('secClose');
+
+/* ===== Bottle: مولّدات SVG للقوارير (دوال نقيّة) ===== */
+App.Bottle=(function(){
  var shapes=[
   'M34 40h52a10 10 0 0 1 10 10v92a10 10 0 0 1-10 10H34a10 10 0 0 1-10-10V50a10 10 0 0 1 10-10z',
   'M60 36c26 0 38 22 38 52 0 34-14 64-38 64S22 122 22 88c0-30 12-52 38-52z',
@@ -804,236 +882,341 @@ function bottleBig(idx,c1,c2,code,v){
   'M42 38h36l16 114H26z',
   'M38 50a22 16 0 0 1 44 0v92a10 10 0 0 1-10 10H48a10 10 0 0 1-10-10z'];
  var caps=['<rect x="50" y="8" width="20" height="22" rx="4"/>','<circle cx="60" cy="16" r="11"/>','<rect x="42" y="12" width="36" height="16" rx="4"/>','<rect x="51" y="6" width="18" height="24" rx="3"/>','<rect x="53" y="10" width="14" height="20" rx="6"/>'];
- var s=shapes[v];
- return '<svg class="bottle" viewBox="0 -34 120 200" aria-hidden="true">'
- +'<defs><linearGradient id="bg'+idx+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+c1+'" stop-opacity=".5"/><stop offset="1" stop-color="'+c2+'" stop-opacity=".85"/></linearGradient>'
- +'<linearGradient id="bl'+idx+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+c1+'"/><stop offset="1" stop-color="'+c2+'"/></linearGradient>'
- +'<clipPath id="bc'+idx+'"><path d="'+s+'"/></clipPath></defs>'
- +'<ellipse cx="60" cy="156" rx="36" ry="5" fill="rgba(0,0,0,.35)"/>'
- +'<g fill="url(#gold)">'+caps[v]+'</g><rect x="55" y="28" width="10" height="32" fill="#3a2a18"/>'
- +'<path d="'+s+'" fill="url(#bg'+idx+')" stroke="rgba(255,236,200,.28)" stroke-width="1.2"/>'
- +'<g clip-path="url(#bc'+idx+')"><rect class="liq" x="16" y="96" width="88" height="72" fill="url(#bl'+idx+')" opacity=".92"/>'
- +'<ellipse cx="60" cy="96" rx="44" ry="6" fill="'+c1+'" opacity=".75"/></g>'
- +'<path d="M34 48q-5 48 3 96" stroke="rgba(255,255,255,.2)" stroke-width="5" fill="none" stroke-linecap="round"/>'
- +'<rect x="41" y="104" width="38" height="28" rx="4" fill="#f2e4c4" opacity=".94"/>'
- +'<text x="60" y="120" text-anchor="middle" font-size="'+(code.length>2?9:12)+'" font-weight="700" fill="#4a3418" font-family="Tajawal,sans-serif">'+code+'</text>'
- +'<text x="60" y="128" text-anchor="middle" font-size="4.5" letter-spacing="2" fill="#8a6a33" font-family="Tajawal,sans-serif">PARFUM</text></svg>';
-}
-function bottleMini(){return '<svg viewBox="0 0 40 56" class="mini" aria-hidden="true"><rect x="15" y="1" width="10" height="9" rx="2" fill="#9fb7ad"/><rect x="17" y="9" width="6" height="6" fill="#2c3b35"/><rect x="8" y="14" width="24" height="38" rx="7" fill="rgba(159,216,201,.28)" stroke="rgba(200,240,228,.5)"/><rect x="11" y="30" width="18" height="19" rx="5" fill="#6fae9b"/><rect x="13" y="21" width="14" height="7" rx="2" fill="#eef7f2" opacity=".9"/></svg>'}
-
-/* ====== بناء البطاقات ====== */
-var main=document.getElementById('main');
-var bottleHtml=[];
-function meter(lbl,val){return '<div class="m"><span>'+lbl+'</span><div class="bar"><i style="--w:'+val+'%"></i></div><b>'+arN(val)+'٪</b></div>'}
-function blindTag(b){return b?'<span class="blind ok">✓ آمن للشراء الأعمى</span>':'<span class="blind no">⚠ جرِّبه على بشرتك أولاً</span>'}
-function card(d,i){
- var c=CATS[d.c], v=(i*7+d.en.length)%5;
- var code=(d.br.split(/\s+/).map(function(w){return w[0]}).join('').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase())||'•';
- bottleHtml[i]=bottleBig(i,c.c,c.c2,code,v);
- return '<article class="card" data-i="'+i+'" data-cat="'+d.c+'" style="transition-delay:'+((i%3)*70)+'ms">'
- +'<div class="stage" data-bottle="'+i+'">'
- +'<span class="rank">'+arN(String(i+1).padStart(2,'0'))+'</span>'
- +'<button class="fav'+(favs.has(i)?' on':'')+'" data-fav="'+i+'" title="حفظ في المفضلة" aria-label="حفظ في المفضلة" aria-pressed="'+(favs.has(i)?'true':'false')+'">'+(favs.has(i)?'♥':'♡')+'</button>'
- +'<span class="altbadge" title="البديل: '+d.an+' — '+d.abr+'">'+bottleMini()+'<span class="abx"><b>البديل</b><small>'+d.abr+'</small></span></span></div>'
- +'<div class="cbody"><div class="who"><h3>'+d.n+'<small>'+d.en+'</small></h3>'
- +'<p class="pbrand">'+d.br+' · '+d.bar+'<span class="price">'+d.price+'</span><span class="rate">★ '+d.rate+'</span></p></div>'
- +'<div class="notes"><b>نوتات الأصلي</b><div class="chips">'+d.notes.map(function(n){return '<span class="chip">'+n+'</span>'}).join('')+'</div></div>'
- +'<div class="perf">'+meter('الثبات',d.pf)+meter('الفوحان',d.ps)+blindTag(d.bl)+'</div>'
- +'<div class="altblock"><div class="alt-head"><span class="altpill">البديل المقترح</span><b>'+d.an+'</b><small>'+d.abr+' · '+d.abar+'</small></div>'
- +'<div class="chips">'+d.anotes.map(function(n){return '<span class="chip a">'+n+'</span>'}).join('')+'</div>'
- +'<div class="perf alt">'+meter('الثبات',d.af)+meter('الفوحان',d.as)+blindTag(d.bla)+'</div></div></div></article>';
-}
-var html='';
-Object.keys(CATS).forEach(function(key,ci){
- var c=CATS[key];
- var items=[];data.forEach(function(d,i){if(d.c===key)items.push({d:d,i:i})});
- html+='<section class="sec" id="sec-'+key+'" style="--c1:'+c.c+';--c2:'+c.c2+'">'
- +'<header class="sech"><span class="secnum">'+arN(String(ci+1).padStart(2,'0'))+'</span>'
- +'<div><h2>'+c.n+'</h2><p>'+c.d+'</p></div><span class="seccount">'+arN(items.length)+' عطور</span></header>'
- +'<div class="grid">'+items.map(function(x){return card(x.d,x.i)}).join('')+'</div></section>';
-});
-main.innerHTML=html;
-if(!main.querySelector('.card')){throw new Error('فشل توليد البطاقات')}
-
-/* ====== الإحصاءات والأرقام القياسية ====== */
-var uniqAlt=new Set(data.map(function(d){return d.an})).size;
-document.getElementById('stats').innerHTML=[[arN(data.length),'عطر مُقيَّم'],[arN(Object.keys(CATS).length),'عائلات عطرية'],[arN(uniqAlt),'بديلاً مدروساً'],[arN(data.length*2),'قراءة ثبات وفوحان']]
- .map(function(s){return '<div class="stat"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join('');
-var topF=data.slice().sort(function(a,b){return b.pf-a.pf})[0];
-var topS=data.slice().sort(function(a,b){return b.ps-a.ps})[0];
-var ac={};data.forEach(function(d){ac[d.an]=(ac[d.an]||0)+1});
-var topA=Object.entries(ac).sort(function(a,b){return b[1]-a[1]})[0];
-document.getElementById('records').innerHTML=
- '<span class="rec">🏆 ملك الثبات: <b>'+topF.n+' '+arN(topF.pf)+'٪</b></span>'
- +'<span class="rec">💨 أقوى فوحان: <b>'+topS.n+' '+arN(topS.ps)+'٪</b></span>'
- +'<span class="rec">🎯 أنفع بديل: <b>'+topA[0]+'</b> بديلاً لـ'+arN(topA[1])+' عطور</span>';
-
-/* ====== بيانات منظمة لمحركات البحث (JSON-LD) ====== */
-var ldEl=document.createElement('script');ldEl.type='application/ld+json';
-ldEl.textContent=JSON.stringify({'@context':'https://schema.org','@type':'ItemList',itemListElement:data.map(function(d,i){return{'@type':'ListItem',position:i+1,item:{'@type':'Product',name:d.en+' | '+d.n,brand:{'@type':'Brand',name:d.br}}}})});
-document.head.appendChild(ldEl);
-
-/* ====== قارورة الواجهة ====== */
-var mv=document.getElementById('mastvis');
-mv.insertAdjacentHTML('beforeend',bottleBig('m','#d4a24e','#7a4a14','عطر',1));
-[['عود','8%','12%','0s'],['عنبر','16%','78%','-.8s'],['مسك','62%','4%','-1.6s'],['زعفران','78%','70%','-2.4s'],['فانيليا','38%','88%','-3.2s'],['جلد','4%','52%','-4s'],['برغموت','86%','38%','-2.8s']]
- .forEach(function(n){mv.insertAdjacentHTML('beforeend','<span class="nchip" style="top:'+n[1]+';inset-inline-start:'+n[2]+';animation-delay:'+n[3]+'">'+n[0]+'</span>')});
-
-/* ====== الفلاتر ====== */
-var chipsBox=document.getElementById('chips');
-chipsBox.innerHTML='<button class="fchip on" data-cat="all" style="--cc:#d4a24e"><i></i>الكل · '+arN(data.length)+'</button>'
- +Object.keys(CATS).map(function(k){return '<button class="fchip" data-cat="'+k+'" style="--cc:'+CATS[k].c+'"><i></i>'+CATS[k].n+'</button>'}).join('')
- +'<button class="fchip" data-cat="fav" style="--cc:#e0627a"><i></i>♡ المفضلة <span id="favc">٠</span></button>';
-var brandSel=document.getElementById('brand'),brandSet={};
-(function(){
- var seen={},barOf={};
- data.forEach(function(d){seen[d.br]=(seen[d.br]||0)+1;barOf[d.br]=d.bar});
- brandSet=seen;
- var arr=Object.keys(seen).sort(function(a,b){return barOf[a].localeCompare(barOf[b],'ar')});
- brandSel.insertAdjacentHTML('beforeend',arr.map(function(br){return '<option value="'+br+'">'+barOf[br]+' · '+arN(seen[br])+'</option>'}).join(''));
+ function big(o){
+  var idx=o.idx,c1=o.c1,c2=o.c2,code=o.code,v=o.v,s=shapes[o.v];
+  return '<svg class="bottle" viewBox="0 -34 120 200" aria-hidden="true">'
+  +'<defs><linearGradient id="bg'+idx+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+c1+'" stop-opacity=".5"/><stop offset="1" stop-color="'+c2+'" stop-opacity=".85"/></linearGradient>'
+  +'<linearGradient id="bl'+idx+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+c1+'"/><stop offset="1" stop-color="'+c2+'"/></linearGradient>'
+  +'<clipPath id="bc'+idx+'"><path d="'+s+'"/></clipPath></defs>'
+  +'<ellipse cx="60" cy="156" rx="36" ry="5" fill="rgba(0,0,0,.35)"/>'
+  +'<g fill="url(#gold)">'+caps[v]+'</g><rect x="55" y="28" width="10" height="32" fill="#3a2a18"/>'
+  +'<path d="'+s+'" fill="url(#bg'+idx+')" stroke="rgba(255,236,200,.28)" stroke-width="1.2"/>'
+  +'<g clip-path="url(#bc'+idx+')"><rect class="liq" x="16" y="96" width="88" height="72" fill="url(#bl'+idx+')" opacity=".92"/>'
+  +'<ellipse cx="60" cy="96" rx="44" ry="6" fill="'+c1+'" opacity=".75"/></g>'
+  +'<path d="M34 48q-5 48 3 96" stroke="rgba(255,255,255,.2)" stroke-width="5" fill="none" stroke-linecap="round"/>'
+  +'<rect x="41" y="104" width="38" height="28" rx="4" fill="#f2e4c4" opacity=".94"/>'
+  +'<text x="60" y="120" text-anchor="middle" font-size="'+(code.length>2?9:12)+'" font-weight="700" fill="#4a3418" font-family="Tajawal,sans-serif">'+code+'</text>'
+  +'<text x="60" y="128" text-anchor="middle" font-size="4.5" letter-spacing="2" fill="#8a6a33" font-family="Tajawal,sans-serif">PARFUM</text></svg>';
+ }
+ function mini(){return '<svg viewBox="0 0 40 56" class="mini" aria-hidden="true"><rect x="15" y="1" width="10" height="9" rx="2" fill="#9fb7ad"/><rect x="17" y="9" width="6" height="6" fill="#2c3b35"/><rect x="8" y="14" width="24" height="38" rx="7" fill="rgba(159,216,201,.28)" stroke="rgba(200,240,228,.5)"/><rect x="11" y="30" width="18" height="19" rx="5" fill="#6fae9b"/><rect x="13" y="21" width="14" height="7" rx="2" fill="#eef7f2" opacity=".9"/></svg>';}
+ return {big:big,mini:mini};
 })();
-function norm(s){return s.toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي')}
-var hay=data.map(function(d){return norm([d.n,d.en,d.br,d.bar,d.an,d.abr,d.abar,CATS[d.c].n].concat(d.notes,d.anotes).join(' '))});
-var curCat='all';
-var q=document.getElementById('q'),blindOnly=document.getElementById('blindOnly'),countEl=document.getElementById('count'),emptyEl=document.getElementById('empty');
-var sortSel=document.getElementById('sort'),favChip=chipsBox.querySelector('[data-cat="fav"]');
-var priceRank=function(p){return p==='$$'?2:p==='$$$'?3:1};
-function updateFavCount(){var el=document.getElementById('favc');if(el)el.textContent=arN(favs.size)}
-function saveState(){
- var p=[];
- if(curCat!=='all')p.push('cat='+curCat);
- var t=q.value.trim();if(t)p.push('q='+encodeURIComponent(t));
- if(blindOnly.checked)p.push('blind=1');
+
+/* ===== Sim: درجة تشابه البدائل (إثراء بيانات نقي + تصنيف) ===== */
+App.Sim=(function(){
+ var normAr=App.Util.normAr;
+ var SIM={
+  /* 🎯 توائم موثقة 88–95 */
+  'باروك روج إكستريه':92,'كلوب دو نوي إنتنس مان':90,'أمبر عود جولد':90,
+  'خمرة':90,'ليو قام':90,'بديع العود أوف جلوري':90,'أسد':88,'٩ بي إم':88,
+  'أمبر عود روبي':88,'جان لو إيمورتال':88,
+  /* ≈ تطابق قوي 80–87 */
+  'فطّان':86,'تراثي بلو':86,'ديتور نوار':86,'بديع العود سبلايم':86,
+  'تريس نوي':85,'كلوب دو نوي سيّاج':85,'فاخر':85,'وودي عود':85,
+  'فنتانا':84,'نجدية':84,'خمرة قهوة':84,'أمبر عود توباكو':84,
+  'كلوب دو نوي أوربان مان':83,'توسكانو ليذر':82,'كلوب دو نوي مايلستون':82,'خمرة دخان':82,
+  'رغبة وود إنتنس':80,'هواس':80,'قائد الفرسان':80,'رمز سيلفر':80,
+  'أمير العود إنتنس':80,'أنا أبيض':80,'فيلفت جولد':80,
+  /* ◐ قريب 74–79 */
+  'هانتر إنتنس':79,'عود مود':78,'أسد زنجبار':78,'رمز جولد':78,'تشوكو مسك':78,'درهم':78,
+  'كورو':76,'تريس جور':76,'أوديسي أوم وايت':76,'ليام غراي':76,'عود مود إكسير':76,
+  'أنا أبيض لذر':76,'عود ٢٤ ساعة':76,'فيتيفر بامبلموس':75,
+  'رغبة':74,'نجدية تريبيوت':74,'ثروة جولد':74,'أوبولنت مسك':74,
+  /* 🌫 بروح مشابهة — البدائل الفضفاضة (نتيجة التدقيق) */
+  'إعجازي':72,'حياتي':72,'ثروة سيلفر':72,'ماهر ليغاسي':72,'ليام بلو شاين':72,
+  'أوديسي ميغا':72,'ماهر':72,'شادو':70,'أريستوقراط':70
+ };
+ var SIMN={};for(var k in SIM){SIMN[normAr(k)]=SIM[k];}
+ function scoreOf(name){var sc=SIMN[normAr(name)];return sc==null?75:sc;}
+ function tierOf(sc){
+  if(sc>=88)return{t:'🎯 توأم موثق',c:'sim-twin'};
+  if(sc>=80)return{t:'≈ تطابق قوي',c:'sim-strong'};
+  if(sc>=74)return{t:'◐ قريب',c:'sim-close'};
+  return{t:'🌫 بروح مشابهة',c:'sim-vibe'};
+ }
+ function assignScores(){data.forEach(function(d){d.sim=scoreOf(d.an);});}
+ return {scoreOf:scoreOf,tierOf:tierOf,assignScores:assignScores};
+})();
+
+/* ===== Store: مصدر الحالة الموحّد ===== */
+App.Store=(function(){
+ var state={curCat:'all'};
+ return {
+  get:function(k){return state[k];},
+  set:function(k,v){state[k]=v;}
+ };
+})();
+
+/* ===== Render: بناء سلاسل DOM (دوال نقيّة) ===== */
+App.Render=(function(){
+ var arN=App.Util.arN;
+ var bottleHtml=[];
+ function meter(lbl,val){return '<div class="m"><span>'+lbl+'</span><div class="bar"><i style="--w:'+val+'%"></i></div><b>'+arN(val)+'٪</b></div>';}
+ function blindTag(b){return b?'<span class="blind ok">✓ آمن للشراء الأعمى</span>':'<span class="blind no">⚠ جرِّبه على بشرتك أولاً</span>';}
+ function simBadge(i){
+  var t=App.Sim.tierOf(data[i].sim);
+  return '<span class="sim '+t.c+'" title="درجة تشابه البديل مع الأصلي">'+t.t+' <b>'+arN(data[i].sim)+'٪</b></span>';
+ }
+ function card(d,i){
+  var c=CATS[d.c],v=(i*7+d.en.length)%5;
+  var code=(d.br.split(/\s+/).map(function(w){return w[0]}).join('').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase())||'•';
+  bottleHtml[i]=App.Bottle.big({idx:i,c1:c.c,c2:c.c2,code:code,v:v});
+  return '<article class="card" data-i="'+i+'" data-cat="'+d.c+'" style="transition-delay:'+((i%3)*70)+'ms">'
+  +'<div class="stage" data-bottle="'+i+'">'
+  +'<span class="rank">'+arN(String(i+1).padStart(2,'0'))+'</span>'
+  +'<button class="fav'+(favs.has(i)?' on':'')+'" data-fav="'+i+'" title="حفظ في المفضلة" aria-label="حفظ في المفضلة" aria-pressed="'+(favs.has(i)?'true':'false')+'">'+(favs.has(i)?'♥':'♡')+'</button>'
+  +'<span class="altbadge" title="البديل: '+d.an+' — '+d.abr+'">'+App.Bottle.mini()+'<span class="abx"><b>البديل</b><small>'+d.abr+'</small></span></span></div>'
+  +'<div class="cbody"><div class="who"><h3>'+d.n+'<small>'+d.en+'</small></h3>'
+  +'<p class="pbrand">'+d.br+' · '+d.bar+'<span class="price">'+d.price+'</span><span class="rate">★ '+d.rate+'</span></p></div>'
+  +'<div class="notes"><b>نوتات الأصلي</b><div class="chips">'+d.notes.map(function(n){return '<span class="chip">'+n+'</span>'}).join('')+'</div></div>'
+  +'<div class="perf">'+meter('الثبات',d.pf)+meter('الفوحان',d.ps)+blindTag(d.bl)+'</div>'
+  +'<div class="altblock"><div class="alt-head"><span class="altpill">البديل المقترح</span><b>'+d.an+'</b><small>'+d.abr+' · '+d.abar+'</small></div>'
+  +'<div class="chips">'+d.anotes.map(function(n){return '<span class="chip a">'+n+'</span>'}).join('')+'</div>'
+  +'<div class="perf alt">'+meter('الثبات',d.af)+meter('الفوحان',d.as)+blindTag(d.bla)+'</div></div></div></article>';
+ }
+ function sections(){
+  var html='';
+  Object.keys(CATS).forEach(function(key,ci){
+   var c=CATS[key];
+   var items=[];data.forEach(function(d,i){if(d.c===key)items.push({d:d,i:i})});
+   html+='<section class="sec" id="sec-'+key+'" style="--c1:'+c.c+';--c2:'+c.c2+'">'
+   +'<header class="sech"><span class="secnum">'+arN(String(ci+1).padStart(2,'0'))+'</span>'
+   +'<div><h2>'+c.n+'</h2><p>'+c.d+'</p></div><span class="seccount">'+arN(items.length)+' عطور</span></header>'
+   +'<div class="grid">'+items.map(function(x){return card(x.d,x.i)}).join('')+'</div></section>';
+  });
+  return html;
+ }
+ function stats(){
+  var uniqAlt=new Set(data.map(function(d){return d.an})).size;
+  document.getElementById('stats').innerHTML=[[arN(data.length),'عطر مُقيَّم'],[arN(Object.keys(CATS).length),'عائلات عطرية'],[arN(uniqAlt),'بديلاً مدروساً'],[arN(data.length*2),'قراءة ثبات وفوحان']]
+   .map(function(s){return '<div class="stat"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join('');
+ }
+ function records(){
+  var topF=data.slice().sort(function(a,b){return b.pf-a.pf})[0];
+  var topS=data.slice().sort(function(a,b){return b.ps-a.ps})[0];
+  var ac={};data.forEach(function(d){ac[d.an]=(ac[d.an]||0)+1});
+  var topA=Object.entries(ac).sort(function(a,b){return b[1]-a[1]})[0];
+  document.getElementById('records').innerHTML=
+   '<span class="rec">🏆 ملك الثبات: <b>'+topF.n+' '+arN(topF.pf)+'٪</b></span>'
+   +'<span class="rec">💨 أقوى فوحان: <b>'+topS.n+' '+arN(topS.ps)+'٪</b></span>'
+   +'<span class="rec">🎯 أنفع بديل: <b>'+topA[0]+'</b> بديلاً لـ'+arN(topA[1])+' عطور</span>';
+ }
+ function jsonld(){
+  var ldEl=document.createElement('script');ldEl.type='application/ld+json';
+  ldEl.textContent=JSON.stringify({'@context':'https://schema.org','@type':'ItemList',itemListElement:data.map(function(d,i){return{'@type':'ListItem',position:i+1,item:{'@type':'Product',name:d.en+' | '+d.n,brand:{'@type':'Brand',name:d.br}}}})});
+  document.head.appendChild(ldEl);
+ }
+ function masthead(){
+  var mv=document.getElementById('mastvis');
+  mv.insertAdjacentHTML('beforeend',App.Bottle.big({idx:'m',c1:'#d4a24e',c2:'#7a4a14',code:'عطر',v:1}));
+  [['عود','8%','12%','0s'],['عنبر','16%','78%','-.8s'],['مسك','62%','4%','-1.6s'],['زعفران','78%','70%','-2.4s'],['فانيليا','38%','88%','-3.2s'],['جلد','4%','52%','-4s'],['برغموت','86%','38%','-2.8s']]
+   .forEach(function(n){mv.insertAdjacentHTML('beforeend','<span class="nchip" style="top:'+n[1]+';inset-inline-start:'+n[2]+';animation-delay:'+n[3]+'">'+n[0]+'</span>')});
+ }
+ return {bottleHtml:bottleHtml,card:card,sections:sections,stats:stats,records:records,jsonld:jsonld,masthead:masthead,simBadge:simBadge};
+})();
+
+/* ===== Filter: منطق الفلترة (نقي — بلا وصول للـ DOM) ===== */
+App.Filter=(function(){
+ var norm=App.Util.norm;
+ var hay=data.map(function(d){return norm([d.n,d.en,d.br,d.bar,d.an,d.abr,d.abar,CATS[d.c].n].concat(d.notes,d.anotes).join(' '));});
+ function matches(i,s){
+  var d=data[i];
+  return (s.curCat==='all'||d.c===s.curCat)
+      && (s.curBrand==='all'||d.br===s.curBrand)
+      && (!s.term||hay[i].indexOf(s.term)>-1)
+      && (!s.blindOnly||d.bla)
+      && (!s.favOnly||favs.has(i));
+ }
+ return {hay:hay,matches:matches};
+})();
+
+/* ===== Sort: منطق الترتيب (نقي — بلا وصول للـ DOM) ===== */
+App.Sort=(function(){
+ var priceRank=App.Util.priceRank;
+ function by(idxs,mode){
+  return idxs.slice().sort(function(ia,ib){
+   var A=data[ia],B=data[ib];
+   if(mode==='rate')return B.rate-A.rate;
+   if(mode==='pf')return B.pf-A.pf;
+   if(mode==='ps')return B.ps-A.ps;
+   if(mode==='price')return priceRank(A.price)-priceRank(B.price);
+   if(mode==='name')return A.n.localeCompare(B.n,'ar');
+   return ia-ib;
+  });
+ }
+ return {by:by};
+})();
+
+/* ===== Router: مزامنة الحالة مع رابط الصفحة ===== */
+App.Router=(function(){
+ function saveState(){
+  var p=[],curCat=App.Store.get('curCat');
+  if(curCat!=='all')p.push('cat='+curCat);
+  var t=q.value.trim();if(t)p.push('q='+encodeURIComponent(t));
+  if(blindOnly.checked)p.push('blind=1');
   if(sortSel.value!=='rank')p.push('sort='+sortSel.value);
   if(brandSel.value!=='all')p.push('brand='+encodeURIComponent(brandSel.value));
   if(favChip.classList.contains('on'))p.push('fav=1');
- var h=p.length?'#'+p.join('&'):'';
- if((h||'#')!==location.hash)history.replaceState(null,'',h||location.pathname+location.search);
-}
-function loadState(){
- var kv={};location.hash.slice(1).split('&').forEach(function(p){var s=p.split('=');if(s[0])kv[s[0]]=decodeURIComponent(s.slice(1).join('='))});
- if(kv.cat&&CATS[kv.cat]){curCat=kv.cat}
- if(typeof kv.q==='string'){q.value=kv.q}
- if(kv.blind==='1'){blindOnly.checked=true}
+  var h=p.length?'#'+p.join('&'):'';
+  if((h||'#')!==location.hash)history.replaceState(null,'',h||location.pathname+location.search);
+ }
+ function loadState(){
+  var kv={};location.hash.slice(1).split('&').forEach(function(p){var s=p.split('=');if(s[0])kv[s[0]]=decodeURIComponent(s.slice(1).join('='))});
+  if(kv.cat&&CATS[kv.cat]){App.Store.set('curCat',kv.cat)}
+  if(typeof kv.q==='string'){q.value=kv.q}
+  if(kv.blind==='1'){blindOnly.checked=true}
   if(['rank','rate','pf','ps','price','name'].indexOf(kv.sort)>-1){sortSel.value=kv.sort}
   if(typeof kv.brand==='string'&&brandSet[kv.brand]){brandSel.value=kv.brand}else{brandSel.value='all'}
   if(kv.fav==='1'){favChip.classList.add('on')}
-}
-function syncChips(){chipsBox.querySelectorAll('.fchip').forEach(function(x){if(x.dataset.cat!=='fav')x.classList.toggle('on',x.dataset.cat===curCat)})}
-function apply(){
- var term=norm(q.value.trim()),vis=0,sortMode=sortSel.value,favOnly=favChip.classList.contains('on'),curBrand=brandSel.value;
- document.querySelectorAll('.card').forEach(function(el){
-  var i=+el.dataset.i;
-  var ok=(curCat==='all'||el.dataset.cat===curCat)&&(curBrand==='all'||data[i].br===curBrand)&&(!term||hay[i].indexOf(term)>-1)&&(!blindOnly.checked||data[i].bla)&&(!favOnly||favs.has(i));
-  el.style.display=ok?'':'none';if(ok)vis++;
- });
- document.querySelectorAll('.grid').forEach(function(grid){
-  Array.prototype.slice.call(grid.querySelectorAll('.card')).sort(function(a,b){
-   var A=data[+a.dataset.i],B=data[+b.dataset.i];
-   if(sortMode==='rate')return B.rate-A.rate;
-   if(sortMode==='pf')return B.pf-A.pf;
-   if(sortMode==='ps')return B.ps-A.ps;
-   if(sortMode==='price')return priceRank(A.price)-priceRank(B.price);
-   if(sortMode==='name')return A.n.localeCompare(B.n,'ar');
-   return +a.dataset.i-+b.dataset.i;
-  }).forEach(function(c){grid.appendChild(c)});
- });
- document.querySelectorAll('.sec').forEach(function(s){
-  var any=false;s.querySelectorAll('.card').forEach(function(c){if(c.style.display!=='none')any=true});
-  s.style.display=any?'':'none';
- });
- emptyEl.style.display=vis?'none':'block';
- countEl.textContent='يعرض '+arN(vis)+' من '+arN(data.length)+' عطر ✓';
- saveState();
-}
-q.addEventListener('input',apply);blindOnly.addEventListener('change',apply);sortSel.addEventListener('change',apply);brandSel.addEventListener('change',apply);
-main.addEventListener('click',function(e){
- var b=e.target.closest('[data-fav]');if(!b)return;e.preventDefault();
- var i=+b.dataset.fav;
- if(favs.has(i)){favs.delete(i);b.classList.remove('on');b.setAttribute('aria-pressed','false');b.textContent='♡'}
- else{favs.add(i);b.classList.add('on');b.setAttribute('aria-pressed','true');b.textContent='♥'}
- localStorage.setItem('p100favs',JSON.stringify(Array.from(favs)));updateFavCount();apply();
-});
-addEventListener('hashchange',function(){loadState();syncChips();apply()});
-chipsBox.addEventListener('click',function(e){
- var b=e.target.closest('.fchip');if(!b)return;
- if(b.dataset.cat==='fav'){b.classList.toggle('on');apply();return}
- chipsBox.querySelectorAll('.fchip').forEach(function(x){if(x.dataset.cat!=='fav')x.classList.remove('on')});
- b.classList.add('on');curCat=b.dataset.cat;apply();
- var target=curCat==='all'?null:document.getElementById('sec-'+curCat);
- if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
-});
-loadState();syncChips();updateFavCount();apply();
-
-/* ====== الظهور عند التمرير ====== */
-var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var el=e.target,st=el.querySelector&&el.querySelector('.stage[data-bottle]');if(st&&!st.dataset.loaded){st.insertAdjacentHTML('afterbegin',bottleHtml[+el.dataset.i]||'');st.dataset.loaded='1';bottleHtml[+el.dataset.i]=null}el.classList.add('in');io.unobserve(e.target)})},{threshold:.08});
-document.querySelectorAll('.card,.sech').forEach(function(el){io.observe(el)});
-
-addEventListener('scroll',function(){
- var h=document.documentElement;
- document.getElementById('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
- document.getElementById('toTop').classList.toggle('show',h.scrollTop>600);
-},{passive:true});
-document.getElementById('toTop').onclick=function(){scrollTo({top:0,behavior:'smooth'})};
-/* ============================================================
-   نظام درجة التشابه + تدقيق البدائل
-   يعمل تلقائياً بعد أي فرز/فلترة — لا تعديل آخر مطلوب
-   ============================================================ */
-(function(){
-  function normAr(s){return String(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();}
-
-  /* درجة كل بديل — كلما كانت المحاكاة موثقة أكثر ارتفعت */
-  var SIM={
-    /* 🎯 توائم موثقة 88–95 */
-    'باروك روج إكستريه':92,'كلوب دو نوي إنتنس مان':90,'أمبر عود جولد':90,
-    'خمرة':90,'ليو قام':90,'بديع العود أوف جلوري':90,'أسد':88,'٩ بي إم':88,
-    'أمبر عود روبي':88,'جان لو إيمورتال':88,
-    /* ≈ تطابق قوي 80–87 */
-    'فطّان':86,'تراثي بلو':86,'ديتور نوار':86,'بديع العود سبلايم':86,
-    'تريس نوي':85,'كلوب دو نوي سيّاج':85,'فاخر':85,'وودي عود':85,
-    'فنتانا':84,'نجدية':84,'خمرة قهوة':84,'أمبر عود توباكو':84,
-    'كلوب دو نوي أوربان مان':83,'توسكانو ليذر':82,'كلوب دو نوي مايلستون':82,'خمرة دخان':82,
-    'رغبة وود إنتنس':80,'هواس':80,'قائد الفرسان':80,'رمز سيلفر':80,
-    'أمير العود إنتنس':80,'أنا أبيض':80,'فيلفت جولد':80,
-    /* ◐ قريب 74–79 */
-    'هانتر إنتنس':79,'عود مود':78,'أسد زنجبار':78,'رمز جولد':78,'تشوكو مسك':78,'درهم':78,
-    'كورو':76,'تريس جور':76,'أوديسي أوم وايت':76,'ليام غراي':76,'عود مود إكسير':76,
-    'أنا أبيض لذر':76,'عود ٢٤ ساعة':76,'فيتيفر بامبلموس':75,
-    'رغبة':74,'نجدية تريبيوت':74,'ثروة جولد':74,'أوبولنت مسك':74,
-    /* 🌫 بروح مشابهة — البدائل الفضفاضة (نتيجة التدقيق) */
-    'إعجازي':72,'حياتي':72,'ثروة سيلفر':72,'ماهر ليغاسي':72,'ليام بلو شاين':72,
-    'أوديسي ميغا':72,'ماهر':72,'شادو':70,'أريستوقراط':70
-  };
-  var SIMN={};for(var k in SIM){SIMN[normAr(k)]=SIM[k];}
-
-  function tierOf(sc){
-    if(sc>=88)return{t:'🎯 توأم موثق',c:'sim-twin'};
-    if(sc>=80)return{t:'≈ تطابق قوي',c:'sim-strong'};
-    if(sc>=74)return{t:'◐ قريب',c:'sim-close'};
-    return{t:'🌫 بروح مشابهة',c:'sim-vibe'};
-  }
-
-  data.forEach(function(d){var sc=SIMN[normAr(d.an)];d.sim=(sc==null?75:sc);});
-
-  var AR='٠١٢٣٤٥٦٧٨٩',arN=function(n){return String(n).replace(/\d/g,function(x){return AR[x];});};
-
-  function badge(card){
-    if(card.querySelector('.sim'))return;
-    var i=+card.getAttribute('data-i');if(isNaN(i)||!data[i])return;
-    var head=card.querySelector('.alt-head')||card.querySelector('.altblock');if(!head)return;
-    var t=tierOf(data[i].sim),el=document.createElement('span');
-    el.className='sim '+t.c;el.title='درجة تشابه البديل مع الأصلي';
-    el.innerHTML=t.t+' <b>'+arN(data[i].sim)+'٪</b>';
-    head.appendChild(el);
-  }
-  function injectAll(){var c=document.querySelectorAll('.card');for(var j=0;j<c.length;j++)badge(c[j]);}
-  injectAll();
-
-  var pending=false;
-  new MutationObserver(function(){if(pending)return;pending=true;
-    requestAnimationFrame(function(){pending=false;injectAll();});
-  }).observe(document.getElementById('main')||document.body,{childList:true,subtree:true});
+ }
+ function syncChips(){chipsBox.querySelectorAll('.fchip').forEach(function(x){if(x.dataset.cat!=='fav')x.classList.toggle('on',x.dataset.cat===App.Store.get('curCat'))})}
+ return {saveState:saveState,loadState:loadState,syncChips:syncChips};
 })();
+
+/* ===== Dom: التحديثات الجانبية على الواجهة (الوحدة الوحيدة التي تُعدّل DOM) ===== */
+App.Dom=(function(){
+ var arN=App.Util.arN;
+ function snapshot(){
+  return {
+   term:App.Util.norm(q.value.trim()),
+   sortMode:sortSel.value,
+   favOnly:favChip.classList.contains('on'),
+   curBrand:brandSel.value,
+   curCat:App.Store.get('curCat'),
+   blindOnly:blindOnly.checked
+  };
+ }
+ function setVisibility(s){
+  var vis=0;
+  document.querySelectorAll('.card').forEach(function(el){
+   var ok=App.Filter.matches(+el.dataset.i,s);
+   el.style.display=ok?'':'none';
+   if(ok)vis++;
+  });
+  return vis;
+ }
+ function reorderGrids(mode){
+  document.querySelectorAll('.grid').forEach(function(grid){
+   var byIdx={},idxs=[];
+   grid.querySelectorAll('.card').forEach(function(el){var ix=+el.dataset.i;byIdx[ix]=el;idxs.push(ix);});
+   App.Sort.by(idxs,mode).forEach(function(i){grid.appendChild(byIdx[i]);});
+  });
+ }
+ function hideEmptySections(){
+  document.querySelectorAll('.sec').forEach(function(sec){
+   var any=Array.prototype.some.call(sec.querySelectorAll('.card'),function(c){return c.style.display!=='none';});
+   sec.style.display=any?'':'none';
+  });
+ }
+  function applyView(){
+   var s=snapshot(),vis=setVisibility(s);
+   reorderGrids(s.sortMode);
+   hideEmptySections();
+   emptyEl.style.display=vis?'none':'block';
+   countEl.textContent='يعرض '+arN(vis)+' من '+arN(data.length)+' عطر ✓';
+   renderChrome(s);
+   App.Router.saveState();
+  }
+  function renderChrome(s){
+   var pills=[];
+   if(s.blindOnly)pills.push('<span class="achip" data-clear="blind">آمن فقط للشراء الأعمى<i>✕</i></span>');
+   if(s.curBrand!=='all')pills.push('<span class="achip" data-clear="brand">الدار: '+brandBar[s.curBrand]+'<i>✕</i></span>');
+   activeBox.innerHTML=pills.join('');
+   var nf=(s.blindOnly?1:0)+(s.curBrand!=='all'?1:0)+(s.curCat!=='all'?1:0)+(s.favOnly?1:0);
+   if(nf){fdot.textContent=arN(nf);fbadge.classList.add('has-f')}else{fbadge.classList.remove('has-f')}
+   var len=q.value.length;searchEl.style.setProperty('--qfill',Math.min(len/18,1));searchEl.classList.toggle('has-q',len>0);
+  }
+ function injectSimBadges(){
+  document.querySelectorAll('.card').forEach(function(c){
+   if(c.querySelector('.sim'))return;
+   var i=+c.getAttribute('data-i');if(isNaN(i)||!data[i])return;
+   var head=c.querySelector('.alt-head')||c.querySelector('.altblock');if(!head)return;
+   head.insertAdjacentHTML('beforeend',App.Render.simBadge(i));
+  });
+ }
+ function updateFavCount(){var el=document.getElementById('favc');if(el)el.textContent=arN(favs.size);}
+ return {applyView:applyView,injectSimBadges:injectSimBadges,updateFavCount:updateFavCount};
+})();
+
+/* ===== Boot: التهيئة وربط الأحداث (تنسيق فقط) ===== */
+App.Boot=(function(){
+ var arN=App.Util.arN;
+  function buildToolbar(){
+   var catCount={};data.forEach(function(d){catCount[d.c]=(catCount[d.c]||0)+1});
+   chipsBox.innerHTML='<button class="fchip on" data-cat="all" style="--cc:#d4a24e"><i></i>الكل <b class="cn">'+arN(data.length)+'</b></button>'
+    +Object.keys(CATS).map(function(k){return '<button class="fchip" data-cat="'+k+'" style="--cc:'+CATS[k].c+'"><i></i>'+CATS[k].n+' <b class="cn">'+arN(catCount[k]||0)+'</b></button>'}).join('')
+    +'<button class="fchip" data-cat="fav" style="--cc:#e0627a"><i></i>♡ المفضلة <span id="favc">٠</span></button>';
+  favChip=chipsBox.querySelector('[data-cat="fav"]');
+  var seen={},barOf={};
+  data.forEach(function(d){seen[d.br]=(seen[d.br]||0)+1;barOf[d.br]=d.bar});
+   brandSet=seen;brandBar=barOf;
+  var arr=Object.keys(seen).sort(function(a,b){return barOf[a].localeCompare(barOf[b],'ar')});
+  brandSel.insertAdjacentHTML('beforeend',arr.map(function(br){return '<option value="'+br+'">'+barOf[br]+' · '+arN(seen[br])+'</option>'}).join(''));
+ }
+ function wireEvents(){
+  q.addEventListener('input',App.Dom.applyView);
+  blindOnly.addEventListener('change',App.Dom.applyView);
+  sortSel.addEventListener('change',App.Dom.applyView);
+  brandSel.addEventListener('change',App.Dom.applyView);
+  main.addEventListener('click',function(e){
+   var b=e.target.closest('[data-fav]');if(!b)return;e.preventDefault();
+   var i=+b.dataset.fav;
+   if(favs.has(i)){favs.delete(i);b.classList.remove('on');b.setAttribute('aria-pressed','false');b.textContent='♡';}
+   else{favs.add(i);b.classList.add('on');b.setAttribute('aria-pressed','true');b.textContent='♥';}
+   localStorage.setItem('p100favs',JSON.stringify(Array.from(favs)));App.Dom.updateFavCount();App.Dom.applyView();
+  });
+  addEventListener('hashchange',function(){App.Router.loadState();App.Router.syncChips();App.Dom.applyView();});
+  chipsBox.addEventListener('click',function(e){
+   var b=e.target.closest('.fchip');if(!b)return;
+   if(b.dataset.cat==='fav'){b.classList.toggle('on');App.Dom.applyView();return;}
+   chipsBox.querySelectorAll('.fchip').forEach(function(x){if(x.dataset.cat!=='fav')x.classList.remove('on')});
+   b.classList.add('on');App.Store.set('curCat',b.dataset.cat);App.Dom.applyView();
+   var target=b.dataset.cat==='all'?null:document.getElementById('sec-'+b.dataset.cat);
+    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+   });
+   function openSheet(){secEl.classList.add('open');fbadge.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'}
+   function closeSheet(){secEl.classList.remove('open');fbadge.setAttribute('aria-expanded','false');document.body.style.overflow=''}
+   fbadge.addEventListener('click',function(){secEl.classList.contains('open')?closeSheet():openSheet()});
+   secClose.addEventListener('click',closeSheet);
+   document.addEventListener('click',function(e){if(!secEl.classList.contains('open'))return;if(e.target.closest('.fpanel')||e.target.closest('.fbadge'))return;closeSheet()});
+   qclear.addEventListener('click',function(){q.value='';App.Dom.applyView();q.focus()});
+   resetBtn.addEventListener('click',function(){q.value='';blindOnly.checked=false;sortSel.value='rank';brandSel.value='all';App.Store.set('curCat','all');favChip.classList.remove('on');App.Router.syncChips();closeSheet();App.Dom.applyView()});
+   activeBox.addEventListener('click',function(e){var p=e.target.closest('.achip');if(!p)return;if(p.dataset.clear==='blind')blindOnly.checked=false;else if(p.dataset.clear==='brand')brandSel.value='all';App.Dom.applyView()});
+   addEventListener('keydown',function(e){if(e.key==='Escape'&&secEl.classList.contains('open'))closeSheet()});
+  }
+ function initObservers(){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var el=e.target,st=el.querySelector&&el.querySelector('.stage[data-bottle]');if(st&&!st.dataset.loaded){st.insertAdjacentHTML('afterbegin',App.Render.bottleHtml[+el.dataset.i]||'');st.dataset.loaded='1';App.Render.bottleHtml[+el.dataset.i]=null;}el.classList.add('in');io.unobserve(e.target);})},{threshold:.08});
+  document.querySelectorAll('.card,.sech').forEach(function(el){io.observe(el);});
+  addEventListener('scroll',function(){
+   var h=document.documentElement;
+   document.getElementById('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+   document.getElementById('toTop').classList.toggle('show',h.scrollTop>600);
+  },{passive:true});
+  document.getElementById('toTop').onclick=function(){scrollTo({top:0,behavior:'smooth'});};
+  var pending=false;
+  new MutationObserver(function(){if(pending)return;pending=true;requestAnimationFrame(function(){pending=false;App.Dom.injectSimBadges();});}).observe(main,{childList:true,subtree:true});
+ }
+ function init(){
+  App.Sim.assignScores();
+  main.innerHTML=App.Render.sections();
+  if(!main.querySelector('.card')){throw new Error('فشل توليد البطاقات');}
+  buildToolbar();
+  App.Render.stats();
+  App.Render.records();
+  App.Render.jsonld();
+  App.Render.masthead();
+  App.Router.loadState();
+  App.Router.syncChips();
+  App.Dom.updateFavCount();
+  App.Dom.applyView();
+  App.Dom.injectSimBadges();
+  wireEvents();
+  initObservers();
+ }
+ return {init:init};
+})();
+
+App.Boot.init();
 console.log('✓ تم تحميل العطور بنجاح');
 }catch(err){
  var b=document.createElement('div');b.className='errbar';
