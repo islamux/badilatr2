@@ -218,6 +218,27 @@ footer ul{padding-inline-start:18px}
 .occchip{border-color:rgba(140,152,224,.35)}
 .occchip.on{background:#6a76d8;color:#fff;border-color:transparent}
 #occchips{border-top:1px dashed rgba(212,162,78,.15);padding-top:8px;margin-top:8px}
+/* ===== موسوعة النوتات ===== */
+.notebtn{background:rgba(122,134,214,.15);border:1px solid rgba(140,152,224,.4);color:#b3bcf5;padding:8px 14px;border-radius:12px;cursor:pointer;font:inherit;font-size:.85rem;transition:.25s;white-space:nowrap}
+.notebtn:hover{background:rgba(122,134,214,.3);transform:translateY(-1px)}
+#noteselect{background:#241811;border:1px solid rgba(140,152,224,.3);color:var(--ink);border-radius:12px;padding:8px 12px;font:inherit;font-size:.85rem;cursor:pointer;max-width:180px}
+.notemodal{position:fixed;inset:0;z-index:200;background:rgba(10,6,3,.85);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
+.notemodal.open{display:flex}
+.notemodal-inner{width:100%;max-width:880px;background:#1e140b;border:1px solid rgba(212,162,78,.25);border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.notemodal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid rgba(212,162,78,.15);position:sticky;top:0;background:#1e140b;z-index:2}
+.notemodal-head h3{font-family:'Aref Ruqaa';color:var(--gold);font-size:1.4rem;margin:0}
+.noteclose{background:none;border:none;color:var(--mut);font-size:1.3rem;cursor:pointer;padding:4px 10px;border-radius:8px;transition:.2s}
+.noteclose:hover{color:var(--ink);background:rgba(255,255,255,.06)}
+.notemodal-body{padding:20px 24px}
+.notecat-title{font-family:'Aref Ruqaa';color:var(--gold);font-size:1.05rem;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px dashed rgba(212,162,78,.2)}
+.notecat-title:first-child{margin-top:0}
+.notegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.note-card{background:rgba(255,255,255,.025);border:1px solid rgba(212,162,78,.14);border-radius:12px;padding:12px 14px;cursor:pointer;transition:.25s}
+.note-card:hover{border-color:rgba(140,152,224,.5);background:rgba(122,134,214,.08);transform:translateY(-2px)}
+.note-card-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.note-card-name{font-weight:800;font-size:.95rem;color:var(--ink)}
+.note-card-count{margin-inline-start:auto;font-size:.68rem;color:var(--gold);background:rgba(212,162,78,.12);border:1px solid rgba(212,162,78,.3);padding:1px 8px;border-radius:99px;white-space:nowrap}
+.note-card-desc{font-size:.76rem;color:var(--mut);line-height:1.7}
 </style>
 </head>
 <body>
@@ -265,6 +286,10 @@ footer ul{padding-inline-start:18px}
    <select id="brand" class="sortsel" aria-label="فلتر بحسب الدار المنتجة">
     <option value="all">كل الدور</option>
    </select>
+   <select id="noteselect" class="sortsel" aria-label="فلتر بحسب النوتة">
+    <option value="all">📖 كل النوتات</option>
+   </select>
+   <button class="notebtn" id="notebtn" type="button">📖 موسوعة النوتات</button>
    <button class="reset" id="reset" type="button">↺ إعادة ضبط الفلاتر</button>
   </div>
  </div>
@@ -950,7 +975,7 @@ var favs=new Set(JSON.parse(localStorage.getItem('p100favs')||'[]'));
    ============================================================ */
 var main=document.getElementById('main');
 var q=document.getElementById('q'),blindOnly=document.getElementById('blindOnly');
-var sortSel=document.getElementById('sort'),brandSel=document.getElementById('brand');
+ var sortSel=document.getElementById('sort'),brandSel=document.getElementById('brand'),noteSel=document.getElementById('noteselect'),noteBtn=document.getElementById('notebtn');
 var countEl=document.getElementById('count'),emptyEl=document.getElementById('empty');
 var chipsBox=document.getElementById('chips');
 var favChip,brandSet={},brandBar={};
@@ -1074,9 +1099,96 @@ App.Occ=(function(){
  return {OCCS:OCCS,ICON:OCC_ICON,LABEL:OCC_LABEL,lookup:lookup,injectOcc:injectOcc,injectOccAll:injectOccAll};
 })();
 
+/* ===== Notes: موسوعة النوتات + فلترها (بيانات نقيّة + مولّدات HTML) ===== */
+App.Notes=(function(){
+ var NOTES_DB=[
+  {n:'عود',icon:'🪵',cat:'خشبية',d:'راتنج ثمين يتشكّل في قلب شجرة الأكويلاريا المصابة. عميق خشبي دافئ يميل للحيوانية — أثمن مكوّنات العطارة الشرقية.'},
+  {n:'خشب الأرز',icon:'🌲',cat:'خشبية',d:'خشب جاف نظيف حاد قليلاً، يمنح العطر بنيته وصرامته. عمود العائلة الخشبية.'},
+  {n:'خشب الصندل',icon:'🪵',cat:'خشبية',d:'خشب كريمي ناعم حليبي دافئ، يضيف نعومة وثباتاً فاخراً.'},
+  {n:'نجيل الهند',icon:'🌾',cat:'خشبية',d:'جذور عشبية هندية؛ ترابي خشبي مدخن بلمسة حمضية منعشة.'},
+  {n:'باتشولي',icon:'🍂',cat:'خشبية',d:'أوراق مخمّرة مجففة؛ ترابي حلو داكن رطب، عمود الشرقية والشيبر.'},
+  {n:'بتولا',icon:'🌳',cat:'خشبية',d:'خشب مدبوغ جلدي مدخن، يعطي الطابع الجلدي الذكوري (بصمة أفينتوس).'},
+  {n:'عنبر',icon:'🟠',cat:'شرقية وراتنجات',d:'مزيج دافئ حلو من الراتنجات والفانيليا؛ يمنح العمق والثبات والفخامة.'},
+  {n:'أمبروكسان',icon:'✨',cat:'شرقية وراتنجات',d:'جزيء صناعي يحاكي العنبر الرمادي؛ نظيف معدني منتشر، سرّ الفوحان العصري.'},
+  {n:'بخور',icon:'🕯',cat:'شرقية وراتنجات',d:'راتنج اللبان المحروق؛ دخاني روحاني، قلب العطور الشرقية الثقيلة.'},
+  {n:'بنزوين',icon:'🟡',cat:'شرقية وراتنجات',d:'راتنج حلو يشبه الفانيليا والقرفة، يضيف دفئاً بلسمياً ناعماً.'},
+  {n:'مسك',icon:'🤍',cat:'مسكية وحيوانية',d:'ناعم نظيف جلدي دافئ؛ يثبّت العطر ويطيل عمره. أصله حيواني واليوم مخبري.'},
+  {n:'جلد',icon:'🧳',cat:'مسكية وحيوانية',d:'رائحة الجلد المدبوغ؛ ذكورية فاخرة تتراوح بين التبغ والشامواه.'},
+  {n:'ورد',icon:'🌹',cat:'زهرية',d:'ملك الزهور؛ حلو عميق مخملي، قلب الشرقية والزهرية الفاخرة.'},
+  {n:'ياسمين',icon:'🌸',cat:'زهرية',d:'زهرة بيضاء حلوة مشعة حسية، تضيف إشراقاً وامتلاءً.'},
+  {n:'سوسن',icon:'🪻',cat:'زهرية',d:'جذور بودرية ناعمة مخملية؛ الطابع الأرستقراطي البارد (بصمة ديور أوم).'},
+  {n:'نيرولي',icon:'🍊',cat:'زهرية',d:'زهر البرتقال المر؛ منعش حلو أخضر، افتتاحية كلاسيكية أنيقة.'},
+  {n:'إبرة الراعي',icon:'🌺',cat:'زهرية',d:'زهرة خضراء وردية منعشة بلمسة نعناعية.'},
+  {n:'حمضيات',icon:'🍋',cat:'حمضيات',d:'عائلة الليمون والبرتقال المنعشة؛ افتتاحية مشرقة فورية.'},
+  {n:'برغموت',icon:'🍋',cat:'حمضيات',d:'حمضيات إيطالية أنيقة منعشة؛ افتتاحية نصف عطور العالم.'},
+  {n:'ليمون',icon:'🍋',cat:'حمضيات',d:'حموضة منعشة مشرقة، طاقة فورية.'},
+  {n:'جريب فروت',icon:'🍊',cat:'حمضيات',d:'حمضيات مرة منعشة حادة، توقيع العطور الرياضية.'},
+  {n:'يوسفي',icon:'🍊',cat:'حمضيات',d:'حمضيات حلوة دافئة ناعمة.'},
+  {n:'زعفران',icon:'🌶',cat:'توابل',d:'أغلى توابل العالم؛ جلدي حلو مر معدني، بصمة الفخامة (BR540).'},
+  {n:'قرفة',icon:'🟤',cat:'توابل',d:'توابل حلوة دافئة حادة، قلب العطور الشتوية.'},
+  {n:'هيل',icon:'🟢',cat:'توابل',d:'توابل خضراء منعشة حلوة؛ ملكة التوابل، توقيع لا نوي.'},
+  {n:'جوزة الطيب',icon:'🟤',cat:'توابل',d:'توابل دافئة حلوة خشبية.'},
+  {n:'فلفل',icon:'🌶',cat:'توابل',d:'حدة لاذعة منعشة تفتح الافتتاحية.'},
+  {n:'زنجبيل',icon:'🟡',cat:'توابل',d:'توابل حارة منعشة ليمونية.'},
+  {n:'توابل',icon:'🌶',cat:'توابل',d:'مزيج حار دافئ؛ يضيف شخصية وحرارة.'},
+  {n:'فانيليا',icon:'🍦',cat:'حلوة وجورماند',d:'حلاوة دافئة كريمية؛ أشهر النوتات وأحبها.'},
+  {n:'تونكا',icon:'🫘',cat:'حلوة وجورماند',d:'بذور حلوة تشبه الفانيليا واللوز والقرفة معاً.'},
+  {n:'كراميل',icon:'🍮',cat:'حلوة وجورماند',d:'سكر محروق حلو دافئ، بصمة سكاندال.'},
+  {n:'شوكولاتة',icon:'🍫',cat:'حلوة وجورماند',d:'كاكاو حلو داكن دافئ.'},
+  {n:'عسل',icon:'🍯',cat:'حلوة وجورماند',d:'حلاوة زهرية دافئة بلمسة حيوانية، قلب ناكسوس.'},
+  {n:'قهوة',icon:'☕',cat:'حلوة وجورماند',d:'محمص داكن حلو مر.'},
+  {n:'لوز',icon:'🌰',cat:'حلوة وجورماند',d:'حلو كريمي بلمسة مرّة أحياناً.'},
+  {n:'روم',icon:'🥃',cat:'مشروبات (بوزية)',d:'مشروب قصب السكر؛ دافئ حلو مسكر.'},
+  {n:'كونياك',icon:'🥃',cat:'مشروبات (بوزية)',d:'مشروب عنب معتق؛ دافئ فاكهي مسكر، قلب أنجلز شير.'},
+  {n:'ويسكي',icon:'🥃',cat:'مشروبات (بوزية)',d:'مشروب حبوب معتق؛ خشبي مسكر، قلب باراوندا.'},
+  {n:'لافندر',icon:'💜',cat:'عشبية وخضراء',d:'عطر الحلاقين الكلاسيكي؛ عشبي منعش نظيف.'},
+  {n:'نعناع',icon:'🌿',cat:'عشبية وخضراء',d:'منعش بارد أخضر فوري.'},
+  {n:'مريمية',icon:'🌿',cat:'عشبية وخضراء',d:'عشبية خضراء منعشة.'},
+  {n:'إكليل الجبل',icon:'🌿',cat:'عشبية وخضراء',d:'عشبي خشبي منعش.'},
+  {n:'نوتات خضراء',icon:'🌿',cat:'عشبية وخضراء',d:'عشب وأوراق مقطوعة حديثاً؛ انتعاح طبيعي.'},
+  {n:'نوتة بحرية',icon:'🌊',cat:'بحرية',d:'نسيم المحيط ورذاذ الملح.'},
+  {n:'أناناس',icon:'🍍',cat:'فواكه',d:'فاكهة استوائية حلوة حادة، بصمة أفينتوس.'},
+  {n:'تفاح',icon:'🍎',cat:'فواكه',d:'فاكهي منعش حلو.'},
+  {n:'كشمش أسود',icon:'🫐',cat:'فواكه',d:'ثمار داكنة حلوة حامضية.'},
+  {n:'تبغ',icon:'🚬',cat:'أخرى',d:'أوراق التبغ؛ حلو داكن جلدي، قلب الرجالية الكلاسيكية.'}
+ ];
+ var CAT_ORDER=['خشبية','شرقية وراتنجات','مسكية وحيوانية','زهرية','حمضيات','توابل','حلوة وجورماند','مشروبات (بوزية)','عشبية وخضراء','بحرية','فواكه','أخرى'];
+ var present=[];
+ function populate(){
+  var arN=App.Util.arN;
+  NOTES_DB.forEach(function(nt){
+   nt.count=0;
+   data.forEach(function(d){if((d.notes||[]).some(function(x){return x.indexOf(nt.n)>-1;}))nt.count++;});
+  });
+  present=NOTES_DB.filter(function(nt){return nt.count>0;});
+ }
+ function optionsHTML(){
+  var arN=App.Util.arN;
+  var sorted=present.slice().sort(function(a,b){return b.count-a.count;});
+  return '<option value="all">📖 كل النوتات</option>'+sorted.map(function(nt){return '<option value="'+nt.n+'">'+nt.icon+' '+nt.n+' ('+arN(nt.count)+')</option>';}).join('');
+ }
+ function glossaryHTML(){
+  var arN=App.Util.arN;var html='';
+  CAT_ORDER.forEach(function(c){
+   var items=present.filter(function(nt){return nt.cat===c;}).sort(function(a,b){return b.count-a.count;});
+   if(!items.length)return;
+   html+='<div class="notecat-title">'+c+'</div><div class="notegrid">';
+   items.forEach(function(nt){
+    html+='<div class="note-card" data-note="'+nt.n+'"><div class="note-card-top"><span>'+nt.icon+'</span>'+
+      '<span class="note-card-name">'+nt.n+'</span><span class="note-card-count">'+arN(nt.count)+' عطراً</span></div>'+
+      '<div class="note-card-desc">'+nt.d+'</div></div>';
+   });
+   html+='</div>';
+  });
+  return html;
+ }
+ function isValid(name){return NOTES_DB.some(function(nt){return nt.n===name;});}
+ return {NOTES_DB:NOTES_DB,populate:populate,optionsHTML:optionsHTML,glossaryHTML:glossaryHTML,isValid:isValid};
+})();
+
 /* ===== Store: مصدر الحالة الموحّد ===== */
 App.Store=(function(){
- var state={curCat:'all',curOcc:'all'};
+ var state={curCat:'all',curOcc:'all',curNote:'all'};
  return {
   get:function(k){return state[k];},
   set:function(k,v){state[k]=v;}
@@ -1161,8 +1273,9 @@ App.Filter=(function(){
        && (s.curBrand==='all'||d.br===s.curBrand)
        && (!s.term||hay[i].indexOf(s.term)>-1)
        && (!s.blindOnly||d.bla)
-       && (!s.favOnly||favs.has(i))
-       && (s.curOcc==='all'||(d.occ&&d.occ.indexOf(s.curOcc)>-1));
+        && (!s.favOnly||favs.has(i))
+        && (s.curOcc==='all'||(d.occ&&d.occ.indexOf(s.curOcc)>-1))
+        && (s.curNote==='all'||(d.notes&&d.notes.some(function(x){return x.indexOf(s.curNote)>-1;})));
   }
  return {hay:hay,matches:matches};
 })();
@@ -1195,6 +1308,7 @@ App.Router=(function(){
   if(brandSel.value!=='all')p.push('brand='+encodeURIComponent(brandSel.value));
   if(favChip.classList.contains('on'))p.push('fav=1');
   var curOcc=App.Store.get('curOcc');if(curOcc!=='all')p.push('occ='+encodeURIComponent(curOcc));
+  var curNote=App.Store.get('curNote');if(curNote!=='all')p.push('note='+encodeURIComponent(curNote));
   var h=p.length?'#'+p.join('&'):'';
   if((h||'#')!==location.hash)history.replaceState(null,'',h||location.pathname+location.search);
  }
@@ -1207,6 +1321,7 @@ App.Router=(function(){
   if(typeof kv.brand==='string'&&brandSet[kv.brand]){brandSel.value=kv.brand}else{brandSel.value='all'}
   if(kv.fav==='1'){favChip.classList.add('on')}
   if(App.Occ.OCCS.indexOf(kv.occ)>-1){App.Store.set('curOcc',kv.occ)}
+  if(typeof kv.note==='string'&&App.Notes.isValid(kv.note)){App.Store.set('curNote',kv.note)}
  }
  function syncChips(){chipsBox.querySelectorAll('.fchip').forEach(function(x){if(x.dataset.cat!=='fav')x.classList.toggle('on',x.dataset.cat===App.Store.get('curCat'))})}
  return {saveState:saveState,loadState:loadState,syncChips:syncChips};
@@ -1223,6 +1338,7 @@ App.Dom=(function(){
    curBrand:brandSel.value,
    curCat:App.Store.get('curCat'),
    curOcc:App.Store.get('curOcc'),
+   curNote:App.Store.get('curNote'),
    blindOnly:blindOnly.checked
   };
  }
@@ -1262,8 +1378,9 @@ App.Dom=(function(){
    if(s.blindOnly)pills.push('<span class="achip" data-clear="blind">آمن فقط للشراء الأعمى<i>✕</i></span>');
     if(s.curBrand!=='all')pills.push('<span class="achip" data-clear="brand">الدار: '+brandBar[s.curBrand]+'<i>✕</i></span>');
     if(s.curOcc!=='all')pills.push('<span class="achip" data-clear="occ">'+(App.Occ.LABEL[s.curOcc]||s.curOcc)+'<i>✕</i></span>');
+    if(s.curNote!=='all')pills.push('<span class="achip" data-clear="note">نوتة: '+s.curNote+'<i>✕</i></span>');
     activeBox.innerHTML=pills.join('');
-    var nf=(s.blindOnly?1:0)+(s.curBrand!=='all'?1:0)+(s.curCat!=='all'?1:0)+(s.favOnly?1:0)+(s.curOcc!=='all'?1:0);
+    var nf=(s.blindOnly?1:0)+(s.curBrand!=='all'?1:0)+(s.curCat!=='all'?1:0)+(s.favOnly?1:0)+(s.curOcc!=='all'?1:0)+(s.curNote!=='all'?1:0);
    if(nf){fdot.textContent=arN(nf);fbadge.classList.add('has-f')}else{fbadge.classList.remove('has-f')}
    var len=q.value.length;searchEl.style.setProperty('--qfill',Math.min(len/18,1));searchEl.classList.toggle('has-q',len>0);
   }
@@ -1281,8 +1398,9 @@ App.Dom=(function(){
 
 /* ===== Boot: التهيئة وربط الأحداث (تنسيق فقط) ===== */
 App.Boot=(function(){
- var arN=App.Util.arN;
-  function buildToolbar(){
+  var arN=App.Util.arN;
+  var noteModal;
+   function buildToolbar(){
    var catCount={};data.forEach(function(d){catCount[d.c]=(catCount[d.c]||0)+1});
    chipsBox.innerHTML='<button class="fchip on" data-cat="all" style="--cc:#d4a24e"><i></i>الكل <b class="cn">'+arN(data.length)+'</b></button>'
     +Object.keys(CATS).map(function(k){return '<button class="fchip" data-cat="'+k+'" style="--cc:'+CATS[k].c+'"><i></i>'+CATS[k].n+' <b class="cn">'+arN(catCount[k]||0)+'</b></button>'}).join('')
@@ -1296,8 +1414,14 @@ App.Boot=(function(){
   var occRow=document.createElement('div');occRow.className='chips-row';occRow.id='occchips';
   occRow.innerHTML='<button class="fchip occchip on" data-occ="all">🗓 كل المناسبات</button>'+App.Occ.OCCS.map(function(o){return '<button class="fchip occchip" data-occ="'+o+'">'+App.Occ.ICON[o]+' '+o+'</button>';}).join('');
   document.querySelector('.toolbar').appendChild(occRow);
+  /* نوتات: ملء القائمة المنسدلة + بناء نافذة الموسوعة مرة واحدة */
+  noteSel.innerHTML=App.Notes.optionsHTML();
+  noteModal=document.createElement('div');noteModal.className='notemodal';
+  noteModal.innerHTML='<div class="notemodal-inner"><div class="notemodal-head"><h3>موسوعة النوتات العطرية</h3><button class="noteclose" type="button">✕</button></div><div class="notemodal-body">'+App.Notes.glossaryHTML()+'</div></div>';
+  document.body.appendChild(noteModal);
  }
  function syncOccChips(){var r=document.getElementById('occchips');if(!r)return;var cur=App.Store.get('curOcc');r.querySelectorAll('.occchip').forEach(function(x){x.classList.toggle('on',x.dataset.occ===cur)});}
+ function syncNoteSelect(){if(noteSel)noteSel.value=App.Store.get('curNote');}
  function wireEvents(){
   q.addEventListener('input',App.Dom.applyView);
   blindOnly.addEventListener('change',App.Dom.applyView);
@@ -1325,11 +1449,18 @@ App.Boot=(function(){
    secClose.addEventListener('click',closeSheet);
    document.addEventListener('click',function(e){if(!secEl.classList.contains('open'))return;if(e.target.closest('.fpanel')||e.target.closest('.fbadge'))return;closeSheet()});
    qclear.addEventListener('click',function(){q.value='';App.Dom.applyView();q.focus()});
-   resetBtn.addEventListener('click',function(){q.value='';blindOnly.checked=false;sortSel.value='rank';brandSel.value='all';App.Store.set('curCat','all');App.Store.set('curOcc','all');favChip.classList.remove('on');App.Router.syncChips();syncOccChips();closeSheet();App.Dom.applyView()});
-   activeBox.addEventListener('click',function(e){var p=e.target.closest('.achip');if(!p)return;if(p.dataset.clear==='blind')blindOnly.checked=false;else if(p.dataset.clear==='brand')brandSel.value='all';else if(p.dataset.clear==='occ'){App.Store.set('curOcc','all');syncOccChips();}App.Dom.applyView()});
+   resetBtn.addEventListener('click',function(){q.value='';blindOnly.checked=false;sortSel.value='rank';brandSel.value='all';App.Store.set('curCat','all');App.Store.set('curOcc','all');App.Store.set('curNote','all');favChip.classList.remove('on');App.Router.syncChips();syncOccChips();syncNoteSelect();closeSheet();App.Dom.applyView()});
+   activeBox.addEventListener('click',function(e){var p=e.target.closest('.achip');if(!p)return;if(p.dataset.clear==='blind')blindOnly.checked=false;else if(p.dataset.clear==='brand')brandSel.value='all';else if(p.dataset.clear==='occ'){App.Store.set('curOcc','all');syncOccChips();}else if(p.dataset.clear==='note'){App.Store.set('curNote','all');syncNoteSelect();}App.Dom.applyView()});
    var occRow=document.getElementById('occchips');
    if(occRow)occRow.addEventListener('click',function(e){var b=e.target.closest('.occchip');if(!b)return;occRow.querySelectorAll('.occchip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');App.Store.set('curOcc',b.dataset.occ);App.Dom.applyView();});
-   addEventListener('keydown',function(e){if(e.key==='Escape'&&secEl.classList.contains('open'))closeSheet()});
+   noteSel.addEventListener('change',function(){App.Store.set('curNote',noteSel.value);App.Dom.applyView();});
+   noteBtn.addEventListener('click',function(){if(noteModal)noteModal.classList.add('open');});
+   if(noteModal)noteModal.addEventListener('click',function(e){
+    if(e.target.closest('.noteclose')||e.target===noteModal){noteModal.classList.remove('open');return;}
+    var card=e.target.closest('.note-card');
+    if(card){var note=card.getAttribute('data-note');App.Store.set('curNote',note);syncNoteSelect();noteModal.classList.remove('open');App.Dom.applyView();var tb=document.querySelector('.toolbar');if(tb)tb.scrollIntoView({behavior:'smooth'});}
+   });
+   addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(noteModal&&noteModal.classList.contains('open')){noteModal.classList.remove('open');return;}if(secEl.classList.contains('open'))closeSheet()});
   }
  function initObservers(){
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var el=e.target,st=el.querySelector&&el.querySelector('.stage[data-bottle]');if(st&&!st.dataset.loaded){st.insertAdjacentHTML('afterbegin',App.Render.bottleHtml[+el.dataset.i]||'');st.dataset.loaded='1';App.Render.bottleHtml[+el.dataset.i]=null;}el.classList.add('in');io.unobserve(e.target);})},{threshold:.08});
@@ -1345,6 +1476,7 @@ App.Boot=(function(){
  }
  function init(){
   data.forEach(function(d){d.occ=App.Occ.lookup(d.en);});
+  App.Notes.populate();
   App.Sim.assignScores();
   main.innerHTML=App.Render.sections();
   if(!main.querySelector('.card')){throw new Error('فشل توليد البطاقات');}
@@ -1356,6 +1488,7 @@ App.Boot=(function(){
   App.Router.loadState();
   App.Router.syncChips();
   syncOccChips();
+  syncNoteSelect();
   App.Dom.updateFavCount();
   App.Dom.applyView();
   App.Dom.injectSimBadges();
