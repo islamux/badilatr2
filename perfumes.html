@@ -239,6 +239,32 @@ footer ul{padding-inline-start:18px}
 .note-card-name{font-weight:800;font-size:.95rem;color:var(--ink)}
 .note-card-count{margin-inline-start:auto;font-size:.68rem;color:var(--gold);background:rgba(212,162,78,.12);border:1px solid rgba(212,162,78,.3);padding:1px 8px;border-radius:99px;white-space:nowrap}
 .note-card-desc{font-size:.76rem;color:var(--mut);line-height:1.7}
+/* ===== مشاركة وتصحيح ===== */
+.cardacts{position:absolute;top:10px;inset-inline-end:10px;display:flex;gap:6px;z-index:6}
+.cact{width:32px;height:32px;border-radius:50%;background:rgba(22,16,9,.72);border:1px solid rgba(212,162,78,.3);color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.25s;backdrop-filter:blur(4px);padding:0}
+.cact:hover{background:rgba(212,162,78,.28);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.cact svg{width:15px;height:15px;display:block}
+.sharepop{position:fixed;z-index:320;background:linear-gradient(180deg,#241710,#1a120b);border:1px solid rgba(212,162,78,.35);border-radius:12px;box-shadow:0 14px 44px rgba(0,0,0,.55);padding:6px;display:none;min-width:190px}
+.sharepop.open{display:block;animation:gup .22s ease}
+.sharepop button{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--ink);padding:9px 12px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.85rem;text-align:start;transition:.18s}
+.sharepop button:hover{background:rgba(212,162,78,.16);color:var(--gold)}
+.reportmodal{position:fixed;inset:0;z-index:340;background:rgba(10,6,3,.82);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
+.reportmodal.open{display:flex}
+.reportbox{width:100%;max-width:480px;background:linear-gradient(180deg,#241710,#1a120b);border:1px solid rgba(212,162,78,.3);border-radius:16px;padding:22px;animation:gup .3s ease}
+.rhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.rhead h4{font-family:'Aref Ruqaa',serif;color:var(--gold);font-size:1.25rem;margin:0}
+.rclose{background:none;border:1px solid rgba(212,162,78,.3);color:var(--mut);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.95rem;transition:.25s}
+.rclose:hover{color:var(--gold);border-color:var(--gold);transform:rotate(90deg)}
+.rperf{font-weight:800;color:var(--ink);font-size:.95rem;background:rgba(212,162,78,.08);border:1px solid rgba(212,162,78,.2);border-radius:9px;padding:9px 12px;margin-bottom:12px}
+.rlabel{display:block;font-size:.8rem;color:var(--mut);margin-bottom:6px}
+#rtext{width:100%;background:#1a120a;border:1px solid rgba(212,162,78,.25);border-radius:9px;color:var(--ink);padding:10px;font-family:inherit;font-size:.85rem;resize:vertical;min-height:80px;box-sizing:border-box}
+#rtext:focus{outline:none;border-color:var(--gold)}
+.racts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.rbtn{flex:1;min-width:120px;background:rgba(212,162,78,.12);border:1px solid rgba(212,162,78,.3);color:var(--ink);border-radius:9px;padding:10px;cursor:pointer;font-family:inherit;font-size:.82rem;transition:.22s}
+.rbtn:hover{background:rgba(212,162,78,.25);color:var(--gold);transform:translateY(-2px)}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#241710;border:1px solid rgba(212,162,78,.4);color:var(--gold);padding:10px 22px;border-radius:99px;font-size:.85rem;opacity:0;pointer-events:none;transition:.3s;z-index:400}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.card.flash{outline:2px solid var(--gold);outline-offset:3px}
 </style>
 </head>
 <body>
@@ -1510,6 +1536,162 @@ App.Boot=(function(){
   initObservers();
  }
  return {init:init};
+})();
+
+/* ============================================================
+   المشاركة الاجتماعية + تصحيح معلومة
+   ============================================================ */
+(function(){
+  if(typeof data==='undefined')return;
+
+  /* ▼▼▼ بيانات التواصل (تصحيحات القراء) ▼▼▼ */
+  var DEV_CONTACT={
+    email:'fathi733@gmail.com',
+    whatsapp:'967772699924',
+    siteName:'بديل عطر ٢'
+  };
+  /* ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ */
+
+  var arN=window.arN||function(n){return String(n).replace(/\d/g,function(d){return '٠١٢٣٤٥٦٧٨٩'[d];});};
+  var SHARE_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>';
+  var FLAG_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>';
+
+  /* ---------- حقن أزرار البطاقات ---------- */
+  function injectActions(){
+    document.querySelectorAll('.card').forEach(function(card){
+      if(card.querySelector('.cardacts'))return;
+      var idx=card.getAttribute('data-i');
+      card.id='p-'+idx;
+      var acts=document.createElement('div');acts.className='cardacts';
+      acts.innerHTML='<button class="cact cshare" title="مشاركة العطر" data-i="'+idx+'">'+SHARE_SVG+'</button>'
+                    +'<button class="cact creport" title="تصحيح معلومة" data-i="'+idx+'">'+FLAG_SVG+'</button>';
+      var stage=card.querySelector('.stage');
+      if(stage)stage.appendChild(acts);
+    });
+  }
+  var _entryHash=location.hash;
+  injectActions();
+  var _actPending=false;
+  new MutationObserver(function(){if(_actPending)return;_actPending=true;requestAnimationFrame(function(){_actPending=false;injectActions();});})
+    .observe(document.getElementById('main')||document.body,{childList:true,subtree:true});
+
+  /* ---------- توست ---------- */
+  function showToast(msg){
+    var t=document.getElementById('toast');
+    if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}
+    t.textContent=msg;t.classList.add('show');
+    clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('show');},2200);
+  }
+
+  /* ---------- نسخ للحافظة مع بديل احتياطي ---------- */
+  function fallbackCopy(text){
+    var ta=document.createElement('textarea');ta.value=text;
+    ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');showToast('تم النسخ ✓');}catch(e){}
+    document.body.removeChild(ta);
+  }
+  function copyToClipboard(text){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){showToast('تم النسخ ✓');})
+        .catch(function(){fallbackCopy(text);});
+    }else fallbackCopy(text);
+  }
+
+  /* ---------- نص المشاركة ---------- */
+  function buildShareText(idx){
+    var d=data[idx],L=[];
+    L.push('🌿 '+d.n+' — '+d.en);
+    L.push('🏷️ '+d.br);
+    if(d.notes&&d.notes.length)L.push('📝 النوتات: '+d.notes.join('، '));
+    L.push('💪 ثبات '+arN(d.pf)+'٪ · فوحان '+arN(d.ps)+'٪ · '+(d.bl?'✅ آمن للشراء الأعمى':'⚠️ جرِّبه أولاً'));
+    L.push('🔄 البديل: '+d.an+' ('+d.abr+') — ثبات '+arN(d.af)+'٪ · فوحان '+arN(d.as)+'٪');
+    if(location.protocol.indexOf('http')===0)L.push('🔗 '+location.href.split('#')[0]+'#p-'+idx);
+    L.push('— من موسوعة '+DEV_CONTACT.siteName);
+    return L.join('\n');
+  }
+
+  /* ---------- قائمة المشاركة ---------- */
+  var sharePop=document.createElement('div');sharePop.className='sharepop';
+  sharePop.innerHTML='<button data-act="wa">🟢 واتساب</button>'
+    +'<button data-act="tw">𝕏 إكس</button>'
+    +'<button data-act="tg">✈️ تيليجرام</button>'
+    +'<button data-act="copy">📋 نسخ التفاصيل</button>';
+  document.body.appendChild(sharePop);
+  var curShare=null;
+  function showSharePop(btn,idx){
+    curShare=idx;sharePop.classList.add('open');
+    var r=btn.getBoundingClientRect(),pw=sharePop.offsetWidth,ph=sharePop.offsetHeight;
+    var top=r.bottom+8,left=r.left;
+    if(left<10)left=10;
+    if(left+pw>window.innerWidth-10)left=window.innerWidth-pw-10;
+    if(top+ph>window.innerHeight-10)top=Math.max(10,r.top-ph-8);
+    sharePop.style.top=top+'px';sharePop.style.left=left+'px';
+  }
+  function hideSharePop(){sharePop.classList.remove('open');}
+  sharePop.addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b||curShare===null)return;
+    var act=b.getAttribute('data-act'),text=buildShareText(curShare);
+    if(act==='wa')window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+    else if(act==='tw')window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text),'_blank');
+    else if(act==='tg')window.open('https://t.me/share/url?url='+encodeURIComponent(location.href.split('#')[0]+'#p-'+curShare)+'&text='+encodeURIComponent(text),'_blank');
+    else if(act==='copy')copyToClipboard(text);
+    hideSharePop();
+  });
+
+  /* ---------- نافذة التصحيح ---------- */
+  var reportModal=document.createElement('div');reportModal.className='reportmodal';
+  reportModal.innerHTML='<div class="reportbox"><div class="rhead"><h4>🚩 تصحيح معلومة</h4><button class="rclose">✕</button></div>'
+    +'<div class="rperf" id="rperf"></div>'
+    +'<label class="rlabel">ما الخطأ؟ وما الصواب؟</label>'
+    +'<textarea id="rtext" rows="4" placeholder="مثال: الثبات الفعلي أعلى… البديل الأنسب هو…"></textarea>'
+    +'<div class="racts" id="racts"></div></div>';
+  document.body.appendChild(reportModal);
+  var curReport=null;
+  function buildReportActs(){
+    var h='';
+    if(DEV_CONTACT.email)h+='<button class="rbtn" data-act="email">✉️ بريد إلكتروني</button>';
+    if(DEV_CONTACT.whatsapp)h+='<button class="rbtn" data-act="wa">🟢 واتساب</button>';
+    h+='<button class="rbtn" data-act="copy">📋 نسخ النص</button>';
+    document.getElementById('racts').innerHTML=h;
+  }
+  function openReport(idx){
+    curReport=idx;var d=data[idx];
+    document.getElementById('rperf').textContent=d.n+' ('+d.en+')';
+    document.getElementById('rtext').value='';
+    buildReportActs();reportModal.classList.add('open');
+  }
+  reportModal.addEventListener('click',function(e){
+    if(e.target.classList.contains('rclose')||e.target===reportModal){reportModal.classList.remove('open');return;}
+    var b=e.target.closest('.rbtn');if(!b||curReport===null)return;
+    var d=data[curReport];
+    var fix=document.getElementById('rtext').value.trim()||'(لم يُكتب وصف)';
+    var msg='🛠️ تصحيح معلومة — '+DEV_CONTACT.siteName+'\nالعطر: '+d.n+' ('+d.en+')\nالتصحيح: '+fix;
+    var act=b.getAttribute('data-act');
+    if(act==='email'){
+      window.location.href='mailto:'+DEV_CONTACT.email+'?subject='+encodeURIComponent('تصحيح معلومة: '+d.n)+'&body='+encodeURIComponent(msg);
+    }else if(act==='wa'){
+      window.open('https://wa.me/'+DEV_CONTACT.whatsapp+'?text='+encodeURIComponent(msg),'_blank');
+    }else if(act==='copy'){copyToClipboard(msg);}
+  });
+
+  /* ---------- تفويض النقرات ---------- */
+  document.addEventListener('click',function(e){
+    var s=e.target.closest('.cshare');
+    if(s){e.stopPropagation();showSharePop(s,+s.getAttribute('data-i'));return;}
+    var r=e.target.closest('.creport');
+    if(r){e.stopPropagation();hideSharePop();openReport(+r.getAttribute('data-i'));return;}
+    if(!e.target.closest('.sharepop'))hideSharePop();
+  });
+
+  /* ---------- رابط مباشر عند الاستضافة ---------- */
+  if(_entryHash&&/^#p-\d+$/.test(_entryHash)){
+    setTimeout(function(){
+      var t=document.querySelector(_entryHash);
+      if(t){t.scrollIntoView({behavior:'smooth',block:'center'});t.classList.add('flash');
+        setTimeout(function(){t.classList.remove('flash');},2500);}
+    },350);
+  }
 })();
 
 App.Boot.init();
