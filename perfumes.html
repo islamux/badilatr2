@@ -354,6 +354,7 @@ App.Util=(function(){
   arN:function(n){return String(n).replace(/\d/g,function(d){return AR[d]})},
   norm:function(s){return s.toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي')},
   normAr:function(s){return String(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim()},
+  normEn:function(s){return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');},
   priceRank:function(p){return p==='$$'?2:p==='$$$'?3:1}
  };
 })();
@@ -1047,6 +1048,7 @@ App.Bottle=(function(){
 /* ===== Sim: درجة تشابه البدائل (إثراء بيانات نقي + تصنيف) ===== */
 App.Sim=(function(){
  var normAr=App.Util.normAr;
+ var normEn=App.Util.normEn;
  var SIM={
   /* 🎯 توائم موثقة 88–95 */
   'باروك روج إكستريه':92,'كلوب دو نوي إنتنس مان':90,'أمبر عود جولد':90,
@@ -1069,6 +1071,110 @@ App.Sim=(function(){
   'أوديسي ميغا':72,'ماهر':72,'شادو':70,'أريستوقراط':70
  };
  var SIMN={};for(var k in SIM){SIMN[normAr(k)]=SIM[k];}
+ /* تجاوزات موثّقة لدرجات التشابه (المفتاح: الاسم الإنجليزي + البديل العربي بعد التطبيع) */
+ var OVR=[
+  /* الدفعة السادسة: وحوش الميزانية */
+  ['Althaïr','خمرة',76],['Ganymede','أنا أبيض لذر',70],['Kalemat','درهم',74],
+  ['Arabians Tonka','عود مود',72],['Instant Crush','أنا أبيض',74],
+  ['Boccanera','تشوكو مسك',72],['Narcotic Delight','خمرة دخان',76],
+  ['Oudh Infini','رغبة وود إنتنس',74],['Oud Maracujá','أسد زنجبار',70],
+  ['L\u2019Air du Désert Marocain','أمير العود إنتنس',72],
+  /* الدفعة السابعة: أصول عربية */
+  ['Bukhoor Bani Hashim','عود ٢٤ ساعة',82],['Shumukh','عود مود',80],['Tomoh','انا ابيض لذر',76],
+  ['Waseem','ليام غراي',74],['Hob Musk','اوبولنت مسك',80],['Al Wisam Al Leil','رغبه وود انتنس',82],
+  ['Al Areej','عود مود',80],['Azhaar','ماهر ليغاسي',72],['Naseem','اعجازي',72],['Wistam','نجديه تريبيوت',76],
+  ['Dahn Al Oudh','بديع العود اوف جلوري',74],['Sultan','عود مود',78],['Sandal','ليام غراي',72],
+  ['Cool','حياتي',70],['Sultan Al Oud','رغبه',76],['Shampoo','فاخر',72],['Sultan Al Musk','اوبولنت مسك',80],
+  ['Oud Al Leil','رغبه وود انتنس',82],['Layali','عود مود',80],['Misk Al Ghazal','اوبولنت مسك',80],
+  ['Hajir','ثروه سيلفر',74],['Resala','عود مود',80],['Madawi','حياتي',74],['Hiss Al Emarat','بديع العود اوف جلوري',76],
+  ['Saqr','رغبه وود انتنس',80],['Hakeem Oud','عود مود',80],['Lamsa','نجديه تريبيوت',76],
+  ['Saif','رغبه',76],['Dira','انا ابيض لذر',74],['Fakhr','خمره',74],
+  /* الدفعة التاسعة: المكتب والصيف */
+  ['Guerlain Homme','اعجازي',72],
+  ['Salvador Dali Pour Homme','ثروه سيلفر',70],
+  ['Italian Bergamot','اعجازي',72],
+  ['Orange Sanguine','حياتي',70],
+  ['Bergamotto di Calabria','اعجازي',72],
+  ['Eau de Pamplemousse Rose','ثروه سيلفر',72],
+  ['Clean Reserve Skin','اوبولنت مسك',74],
+  ['Jacomo de Jacomo','ثروه سيلفر',68],
+  ['Emanuel Ungaro III','اعجازي',68],
+  ['Karl Lagerfeld Classic','ثروه سيلفر',68],
+  ['Memoire d\u2019une Odeur','ماهر ليغاسي',70],
+  ['Code Colonia','اعجازي',72],
+  ['Egra','حياتي',72],
+  ['Rasasi Blue','فنتانا',72],
+  ['Warm Cotton','اوبولنت مسك',74],
+  ['Clémentine California','حياتي',70],
+  /* الدفعة العاشرة: الإصدارات الحديثة */
+  ['Acqua di Gio Parfum','فنتانا',78],
+  ['Ombré Leather Parfum','انا ابيض لذر',78],
+  ['1 Million Royal','رمز جولد',72],
+  ['Phantom Intense','رمز جولد',70],
+  ['Stronger With You Forever','نجديه تريبيوت',72],
+   ['Armani Code Parfum','ليام بلو شاين',70],
+   /* 🔄 المراجعة — المرحلة ١: تخفيضات الأزواج ٨٠٪+ (OVR لكل زوج لحماية البدائل المشتركة) */
+   ['Aventus','كلوب دو نوي إنتنس مان',88],
+   ['Baccarat Rouge 540','أمبر عود جولد',88],
+   ['Angels\u2019 Share','خمرة',75],
+   ['Tuscan Leather','ليو قام',82],
+   ['Ombre Nomade','جان لو إيمورتال',75],
+   ['Oud for Greatness','بديع العود أوف جلوري',88],
+   ['Oud Satin Mood','بديع العود سبلايم',82],
+   ['Interlude Man','رغبة وود إنتنس',75],
+   ['Naxos','خمرة قهوة',75],
+   ['Erba Pura','أمبر عود روبي',82],
+   ['Grand Soir','فيلفت جولد',75],
+   ['Reflection Man','كلوب دو نوي وايت إمبيريال',72],
+   ['Acqua di Gio','فنتانا',80],
+   ['Y EDP','فاخر',80],
+   ['Sauvage Elixir','أسد',86],
+   ['Eros','نجدية',78],
+   ['Layton','ديتور نوار',82],
+   ['Green Irish Tweed','تريس نوي',78],
+   ['Silver Mountain Water','كلوب دو نوي سيّاج',84],
+   ['Terre d\u2019Hermes','فطّان',80],
+   ['Allure Homme Sport','كلوب دو نوي أوربان مان',80],
+   ['Jazz Club','أمبر عود توباكو',70],
+   ['Tobacco Vanille','أمبر عود توباكو',80],
+   ['Baraonda','خمرة دخان',68],
+   /* 🔄 المراجعة — المرحلة ٢: الأصول الفريدة (سقف ٧٥؛ عائلة فقط ← ٧٠) */
+   ['Kirke','أمبر عود روبي',75],
+   ['Telea','أمبر عود روبي',75],
+   ['Cassiopea','أمبر عود روبي',75],
+   ['Megamare','هواس',70],
+   ['Terroni','رغبة وود إنتنس',72],
+   ['Side Effect','خمرة دخان',72],
+   ['Black Afgano','رغبة وود إنتنس',70],
+   /* 🔄 المراجعة — المرحلة ٣أ: البوزية (بديل غير كحولي ← عائلة فقط ٧٠؛ تداخل ثانوي ← ٧٢؛ زوج توأم قهوة ← ٧٨) */
+   ['Frapin 1270','خمرة',72],
+   ['Speakeasy','أمبر عود توباكو',72],
+   ['Dom Rosa','أنا أبيض',70],
+   ['The Blazing Mr Sam','رغبة وود إنتنس',72],
+   ['Angels\u2019 Share On The Rocks','خمرة',75],
+   ['Black Phantom','خمرة دخان',70],
+   ['Straight to Heaven','رغبة',70],
+   ['Apple Brandy','خمرة دخان',70],
+   ['Bitter Peach','خمرة دخان',70],
+   ['Spiritueuse Double Vanille','خمرة',72],
+   ['Enigma Pour Homme','خمرة دخان',72],
+   ['1740 Marquis de Sade','نجدية تريبيوت',72],
+   ['Vanille Fatale','خمرة قهوة',72],
+   ['Italica','خمرة قهوة',70],
+   ['Boss Bottled Elixir','خمرة قهوة',70],
+   ['Rehab','أمبر عود توباكو',72],
+   ['Boundless','أمبر عود توباكو',72],
+   ['Chergui','رغبة',70],
+   ['Kayali Vanilla 28','أنا أبيض',70],
+   ['Burberry London','خمرة',72],
+   ['Bentley For Men Intense','رغبة وود إنتنس',72],
+   ['Bentley For Men','رغبة وود إنتنس',72],
+   ['Eleventh Hour','ثروة جولد',70],
+   ['Duro','أنا أبيض لذر',72],
+   ['Intoxicated','خمرة قهوة',78],
+   ['By the Fireplace','أمير العود إنتنس',72]
+  ];
+ var OVRN=OVR.map(function(r){return [normEn(r[0]),normAr(r[1]),r[2]];});
  function scoreOf(name){var sc=SIMN[normAr(name)];return sc==null?75:sc;}
  function tierOf(sc){
   if(sc>=88)return{t:'🎯 توأم موثق',c:'sim-twin'};
@@ -1076,7 +1182,13 @@ App.Sim=(function(){
   if(sc>=74)return{t:'◐ قريب',c:'sim-close'};
   return{t:'🌫 بروح مشابهة',c:'sim-vibe'};
  }
- function assignScores(){data.forEach(function(d){d.sim=scoreOf(d.an);});}
+ function assignScores(){
+  data.forEach(function(d){
+   var en=normEn(d.en),an=normAr(d.an),sc=scoreOf(d.an);
+   for(var i=0;i<OVRN.length;i++){if(en===OVRN[i][0]&&an===OVRN[i][1]){sc=OVRN[i][2];break;}}
+   d.sim=sc;
+  });
+ }
   return {scoreOf:scoreOf,tierOf:tierOf,assignScores:assignScores};
 })();
 
@@ -1085,7 +1197,7 @@ App.Occ=(function(){
  var OCC_ICON={'مكتب':'🏢','صيف':'☀️','سهرة':'🌙','موعد':'❤️','شتاء':'❄️','مناسبات':'👔','يومي':'🔄'};
  var OCC_LABEL={'مكتب':'المكتب','صيف':'الصيف','سهرة':'السهرة','موعد':'الموعد','شتاء':'الشتاء','مناسبات':'المناسبات','يومي':'اليومي'};
  var OCCS=['مكتب','صيف','سهرة','موعد','شتاء','مناسبات','يومي'];
- function normEn(s){return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+ var normEn=App.Util.normEn;
  var WARDROBE={
   'Guerlain Homme':['مكتب','يومي'],'Weekend for Men':['مكتب','صيف','يومي'],
   'Kenzo Homme Marine':['صيف','يومي'],'Salvador Dali Pour Homme':['مكتب','يومي'],
@@ -1461,37 +1573,48 @@ App.Boot=(function(){
  }
  function syncOccChips(){var r=document.getElementById('occchips');if(!r)return;var cur=App.Store.get('curOcc');r.querySelectorAll('.occchip').forEach(function(x){x.classList.toggle('on',x.dataset.occ===cur)});}
  function syncNoteSelect(){if(noteSel)noteSel.value=App.Store.get('curNote');}
- function wireEvents(){
-  q.addEventListener('input',App.Dom.applyView);
-  blindOnly.addEventListener('change',App.Dom.applyView);
-  sortSel.addEventListener('change',App.Dom.applyView);
-  brandSel.addEventListener('change',App.Dom.applyView);
-  main.addEventListener('click',function(e){
-   var b=e.target.closest('[data-fav]');if(!b)return;e.preventDefault();
-   var i=+b.dataset.fav;
-   if(favs.has(i)){favs.delete(i);b.classList.remove('on');b.setAttribute('aria-pressed','false');b.textContent='♡';}
-   else{favs.add(i);b.classList.add('on');b.setAttribute('aria-pressed','true');b.textContent='♥';}
-   localStorage.setItem('p100favs',JSON.stringify(Array.from(favs)));App.Dom.updateFavCount();App.Dom.applyView();
-  });
-  addEventListener('hashchange',function(){App.Router.loadState();App.Router.syncChips();App.Dom.applyView();});
-  chipsBox.addEventListener('click',function(e){
-   var b=e.target.closest('.fchip');if(!b)return;
-   if(b.dataset.cat==='fav'){b.classList.toggle('on');App.Dom.applyView();return;}
-   chipsBox.querySelectorAll('.fchip').forEach(function(x){if(x.dataset.cat!=='fav')x.classList.remove('on')});
-   b.classList.add('on');App.Store.set('curCat',b.dataset.cat);App.Dom.applyView();
-   var target=b.dataset.cat==='all'?null:document.getElementById('sec-'+b.dataset.cat);
+  function openSheet(){secEl.classList.add('open');fbadge.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'}
+  function closeSheet(){secEl.classList.remove('open');fbadge.setAttribute('aria-expanded','false');document.body.style.overflow=''}
+  function wireSearch(){
+   q.addEventListener('input',App.Dom.applyView);
+   qclear.addEventListener('click',function(){q.value='';App.Dom.applyView();q.focus()});
+  }
+  function wireFilters(){
+   blindOnly.addEventListener('change',App.Dom.applyView);
+   sortSel.addEventListener('change',App.Dom.applyView);
+   brandSel.addEventListener('change',App.Dom.applyView);
+   resetBtn.addEventListener('click',function(){q.value='';blindOnly.checked=false;sortSel.value='rank';brandSel.value='all';App.Store.set('curCat','all');App.Store.set('curOcc','all');App.Store.set('curNote','all');favChip.classList.remove('on');App.Router.syncChips();syncOccChips();syncNoteSelect();closeSheet();App.Dom.applyView()});
+   activeBox.addEventListener('click',function(e){var p=e.target.closest('.achip');if(!p)return;if(p.dataset.clear==='blind')blindOnly.checked=false;else if(p.dataset.clear==='brand')brandSel.value='all';else if(p.dataset.clear==='occ'){App.Store.set('curOcc','all');syncOccChips();}else if(p.dataset.clear==='note'){App.Store.set('curNote','all');syncNoteSelect();}App.Dom.applyView()});
+  }
+  function wireFavorites(){
+   main.addEventListener('click',function(e){
+    var b=e.target.closest('[data-fav]');if(!b)return;e.preventDefault();
+    var i=+b.dataset.fav;
+    if(favs.has(i)){favs.delete(i);b.classList.remove('on');b.setAttribute('aria-pressed','false');b.textContent='♡';}
+    else{favs.add(i);b.classList.add('on');b.setAttribute('aria-pressed','true');b.textContent='♥';}
+    localStorage.setItem('p100favs',JSON.stringify(Array.from(favs)));App.Dom.updateFavCount();App.Dom.applyView();
+   });
+  }
+  function wireChips(){
+   chipsBox.addEventListener('click',function(e){
+    var b=e.target.closest('.fchip');if(!b)return;
+    if(b.dataset.cat==='fav'){b.classList.toggle('on');App.Dom.applyView();return;}
+    chipsBox.querySelectorAll('.fchip').forEach(function(x){if(x.dataset.cat!=='fav')x.classList.remove('on')});
+    b.classList.add('on');App.Store.set('curCat',b.dataset.cat);App.Dom.applyView();
+    var target=b.dataset.cat==='all'?null:document.getElementById('sec-'+b.dataset.cat);
     if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
    });
-   function openSheet(){secEl.classList.add('open');fbadge.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'}
-   function closeSheet(){secEl.classList.remove('open');fbadge.setAttribute('aria-expanded','false');document.body.style.overflow=''}
+  }
+  function wireFilterSheet(){
    fbadge.addEventListener('click',function(){secEl.classList.contains('open')?closeSheet():openSheet()});
    secClose.addEventListener('click',closeSheet);
    document.addEventListener('click',function(e){if(!secEl.classList.contains('open'))return;if(e.target.closest('.fpanel')||e.target.closest('.fbadge'))return;closeSheet()});
-   qclear.addEventListener('click',function(){q.value='';App.Dom.applyView();q.focus()});
-   resetBtn.addEventListener('click',function(){q.value='';blindOnly.checked=false;sortSel.value='rank';brandSel.value='all';App.Store.set('curCat','all');App.Store.set('curOcc','all');App.Store.set('curNote','all');favChip.classList.remove('on');App.Router.syncChips();syncOccChips();syncNoteSelect();closeSheet();App.Dom.applyView()});
-   activeBox.addEventListener('click',function(e){var p=e.target.closest('.achip');if(!p)return;if(p.dataset.clear==='blind')blindOnly.checked=false;else if(p.dataset.clear==='brand')brandSel.value='all';else if(p.dataset.clear==='occ'){App.Store.set('curOcc','all');syncOccChips();}else if(p.dataset.clear==='note'){App.Store.set('curNote','all');syncNoteSelect();}App.Dom.applyView()});
+  }
+  function wireOccChips(){
    var occRow=document.getElementById('occchips');
    if(occRow)occRow.addEventListener('click',function(e){var b=e.target.closest('.occchip');if(!b)return;occRow.querySelectorAll('.occchip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');App.Store.set('curOcc',b.dataset.occ);App.Dom.applyView();});
+  }
+  function wireNotes(){
    noteSel.addEventListener('change',function(){App.Store.set('curNote',noteSel.value);App.Dom.applyView();});
    noteBtn.addEventListener('click',function(){if(noteModal)noteModal.classList.add('open');});
    if(noteModal)noteModal.addEventListener('click',function(e){
@@ -1499,7 +1622,15 @@ App.Boot=(function(){
     var card=e.target.closest('.note-card');
     if(card){var note=card.getAttribute('data-note');App.Store.set('curNote',note);syncNoteSelect();noteModal.classList.remove('open');App.Dom.applyView();var tb=document.querySelector('.toolbar');if(tb)tb.scrollIntoView({behavior:'smooth'});}
    });
+  }
+  function wireKeyboard(){
    addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(noteModal&&noteModal.classList.contains('open')){noteModal.classList.remove('open');return;}if(secEl.classList.contains('open'))closeSheet()});
+  }
+  function wireHash(){
+   addEventListener('hashchange',function(){App.Router.loadState();App.Router.syncChips();App.Dom.applyView();});
+  }
+  function wireEvents(){
+   wireSearch();wireFilters();wireFavorites();wireChips();wireFilterSheet();wireOccChips();wireNotes();wireKeyboard();wireHash();
   }
  function initObservers(){
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var el=e.target,st=el.querySelector&&el.querySelector('.stage[data-bottle]');if(st&&!st.dataset.loaded){st.insertAdjacentHTML('afterbegin',App.Render.bottleHtml[+el.dataset.i]||'');st.dataset.loaded='1';App.Render.bottleHtml[+el.dataset.i]=null;}el.classList.add('in');io.unobserve(e.target);})},{threshold:.08});
@@ -1695,92 +1826,10 @@ App.Boot=(function(){
 })();
 
 App.Boot.init();
-/* ===== تصحيح درجات الدفعة السادسة (بعد محرك SIM) ===== */
-(function(){
-  function normAr(s){return String(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();}
-  var OVR=[
-    ['Althaïr','خمرة',76],['Ganymede','أنا أبيض لذر',70],['Kalemat','درهم',74],
-    ['Arabians Tonka','عود مود',78],['Instant Crush','أنا أبيض',80],
-    ['Boccanera','تشوكو مسك',72],['Narcotic Delight','خمرة دخان',76],
-    ['Oudh Infini','رغبة وود إنتنس',74],['Oud Maracujá','أسد زنجبار',70],
-    ['L\u2019Air du Désert Marocain','أمير العود إنتنس',72]
-  ];
-  data.forEach(function(d){
-    for(var i=0;i<OVR.length;i++){
-      if(d.en===OVR[i][0] && normAr(d.an)===normAr(OVR[i][1])){d.sim=OVR[i][2];break;}
-    }
-  });
-  document.querySelectorAll('.sim').forEach(function(e){e.remove();}); /* المراقب سيعيد حقنها مصححة */
-})();
-/* ===== تصحيح درجات الدفعة السابعة: أصول عربية ===== */
-(function(){
-  function normAr(s){return String(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();}
-  var OVR=[
-    ['Bukhoor Bani Hashim','عود ٢٤ ساعة',82],['Shumukh','عود مود',80],['Tomoh','انا ابيض لذر',76],
-    ['Waseem','ليام غراي',74],['Hob Musk','اوبولنت مسك',80],['Al Wisam Al Leil','رغبه وود انتنس',82],
-    ['Al Areej','عود مود',80],['Azhaar','ماهر ليغاسي',72],['Naseem','اعجازي',72],['Wistam','نجديه تريبيوت',76],
-    ['Dahn Al Oudh','بديع العود اوف جلوري',74],['Sultan','عود مود',78],['Sandal','ليام غراي',72],
-    ['Cool','حياتي',70],['Sultan Al Oud','رغبه',76],['Shampoo','فاخر',72],['Sultan Al Musk','اوبولنت مسك',80],
-    ['Oud Al Leil','رغبه وود انتنس',82],['Layali','عود مود',80],['Misk Al Ghazal','اوبولنت مسك',80],
-    ['Hajir','ثروه سيلفر',74],['Resala','عود مود',80],['Madawi','حياتي',74],['Hiss Al Emarat','بديع العود اوف جلوري',76],
-    ['Saqr','رغبه وود انتنس',80],['Hakeem Oud','عود مود',80],['Lamsa','نجديه تريبيوت',76],
-    ['Saif','رغبه',76],['Dira','انا ابيض لذر',74],['Fakhr','خمره',74]
-  ];
-  data.forEach(function(d){
-    for(var i=0;i<OVR.length;i++){
-      if(d.en===OVR[i][0] && normAr(d.an)===normAr(OVR[i][1])){d.sim=OVR[i][2];break;}
-    }
-  });
-  document.querySelectorAll('.sim').forEach(function(e){e.remove();});
-})();
-/* ===== تصحيح درجات الدفعة التاسعة: المكتب والصيف ===== */
-(function(){
-  function normAr(s){return String(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();}
-  var OVR=[
-    ['Guerlain Homme','اعجازي',72],
-    ['Salvador Dali Pour Homme','ثروه سيلفر',70],
-    ['Italian Bergamot','اعجازي',72],
-    ['Orange Sanguine','حياتي',70],
-    ['Bergamotto di Calabria','اعجازي',72],
-    ['Eau de Pamplemousse Rose','ثروه سيلفر',72],
-    ['Clean Reserve Skin','اوبولنت مسك',74],
-    ['Jacomo de Jacomo','ثروه سيلفر',68],
-    ['Emanuel Ungaro III','اعجازي',68],
-    ['Karl Lagerfeld Classic','ثروه سيلفر',68],
-    ['Memoire d\u2019une Odeur','ماهر ليغاسي',70],
-    ['Code Colonia','اعجازي',72],
-    ['Egra','حياتي',72],
-    ['Rasasi Blue','فنتانا',72],
-    ['Warm Cotton','اوبولنت مسك',74],
-    ['Clémentine California','حياتي',70]
-  ];
-  data.forEach(function(d){
-    for(var i=0;i<OVR.length;i++){
-      if(d.en===OVR[i][0] && normAr(d.an)===normAr(OVR[i][1])){d.sim=OVR[i][2];break;}
-    }
-  });
-  document.querySelectorAll('.sim').forEach(function(e){e.remove();});
-})();
-/* ===== تصحيح درجات الدفعة العاشرة: الإصدارات الحديثة ===== */
-(function(){
-  function normAr(s){return String(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();}
-  function normEn(s){return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');}
-  var OVR=[
-    ['Acqua di Gio Parfum','فنتانا',78],
-    ['Ombré Leather Parfum','انا ابيض لذر',78],
-    ['1 Million Royal','رمز جولد',72],
-    ['Phantom Intense','رمز جولد',70],
-    ['Stronger With You Forever','نجديه تريبيوت',72],
-    ['Armani Code Parfum','ليام بلو شاين',70]
-  ];
-  data.forEach(function(d){
-    var en=normEn(d.en);
-    for(var i=0;i<OVR.length;i++){
-      if(en===normEn(OVR[i][0]) && normAr(d.an)===normAr(OVR[i][1])){d.sim=OVR[i][2];break;}
-    }
-  });
-  document.querySelectorAll('.sim').forEach(function(e){e.remove();});
-})();
+/* تجاوزات درجات التشابه مُدمجة الآن في App.Sim.assignScores (مصدر موحّد واحد قبل أول عرض) */
+
+
+
 console.log('✓ تم تحميل العطور بنجاح');
 }catch(err){
  var b=document.createElement('div');b.className='errbar';
