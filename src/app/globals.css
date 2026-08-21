@@ -1244,6 +1244,23 @@ footer ul {
   border: 1px solid rgba(160,140,115,0.32);
 }
 
+/* ===== Occasion chips ===== */
+.occchip {
+  border-color: rgba(140,152,224,0.35);
+}
+
+.fchip.on .occchip {
+  background: #6a76d8;
+  color: #fff;
+  border-color: transparent;
+}
+
+#occchips {
+  border-top: 1px dashed rgba(212,162,78,0.15);
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
 /* ===== Reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {
   * {

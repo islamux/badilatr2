@@ -8,6 +8,7 @@ import { assignScores, tierOf } from '@/lib/catalog/similarity';
 import { buildHaystacks, matches } from '@/lib/catalog/filter';
 import { sortBy } from '@/lib/catalog/sort';
 import { NOTES_DB } from '@/lib/catalog/notes';
+import { OCCS, OCC_ICON, OCC_LABEL } from '@/lib/catalog/occasions';
 import type { Perfume, SortMode } from '@/domain/types';
 import { useCatalogState } from '@/hooks/useCatalogState';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -248,6 +249,11 @@ export default function Home() {
       label: BRAND_AR[state.curBrand] ?? state.curBrand,
       clear: () => update('curBrand', 'all'),
     });
+  if (state.curOcc !== 'all')
+    pills.push({
+      label: OCC_ICON[state.curOcc] + ' ' + (OCC_LABEL[state.curOcc] ?? state.curOcc),
+      clear: () => update('curOcc', 'all'),
+    });
   if (state.curNote !== 'all')
     pills.push({ label: state.curNote, clear: () => update('curNote', 'all') });
 
@@ -428,6 +434,13 @@ export default function Home() {
               <Chip key={k} active={state.curCat === k} onClick={() => update('curCat', k)}>
                 <i style={{ background: CATS[k].c }} />
                 {CATS[k].n}
+              </Chip>
+            ))}
+          </div>
+          <div className="chips-row" id="occchips">
+            {OCCS.map((occ) => (
+              <Chip key={occ} active={state.curOcc === occ} onClick={() => update('curOcc', state.curOcc === occ ? 'all' : occ)}>
+                <span className="occchip">{OCC_ICON[occ]} {OCC_LABEL[occ]}</span>
               </Chip>
             ))}
           </div>
