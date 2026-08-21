@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import Link from 'next/link';
 import { CATS, rawPerfumes, applyBoozy } from '@/data/perfumes';
 import { arN, norm } from '@/lib/arabic';
 import { applyOccasions } from '@/lib/catalog/occasions';
@@ -352,6 +353,9 @@ export default function Home() {
             <span className="blind no sm">⚠ جرِّبه أولاً</span>{' '}
             رائحة ذوقية أو سعر مرتفع أو توفر محدود
           </p>
+          <Link href="/quiz/" className="discover-btn">
+            ✨ اكتشف عطرك المثالي
+          </Link>
         </div>
         <div className="mast-vis">
           <span className="ring r1" />
