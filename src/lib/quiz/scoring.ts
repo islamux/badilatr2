@@ -9,7 +9,23 @@ questions.forEach((q) =>
   })
 );
 
-export function profileName(answers: string[]): string {
+/** Quiz answers: single-answer questions are strings, multi-select ones arrays (Q2 families, Q4 notes). */
+export type QuizAnswers = (string | string[])[];
+
+/** Family selections live in the Q2 multi-answer slot (legacy reads answers[1]). */
+function famsOf(answers: QuizAnswers): string[] {
+  return Array.isArray(answers[1]) ? answers[1] : [];
+}
+
+function joined(answers: QuizAnswers): string {
+  return answers.join(' ');
+}
+
+function firstAnswer(answers: QuizAnswers): string | undefined {
+  return typeof answers[0] === 'string' ? answers[0] : undefined;
+}
+
+export function profileName(answers: QuizAnswers): string {
   const a = answers.join(' ');
   if (/gourmand|vanilla|sweet/.test(a)) return 'الجورماند الدافئ';
   if (/citrus|aromatic|aquatic|hot/.test(a)) return 'المنعش المضيء';
@@ -20,11 +36,11 @@ export function profileName(answers: string[]): string {
   return 'المتوازن الأنيق';
 }
 
-export function getReasons(d: Perfume, answers: string[]): string[] {
+export function getReasons(d: Perfume, answers: QuizAnswers): string[] {
   const r: string[] = [];
-  const all = answers.join(' ');
+  const all = joined(answers);
   const notes = (d.notes || []).concat(d.anotes || []);
-  const fams = answers.filter((a) => Object.keys(CATS).includes(a));
+  const fams = famsOf(answers);
 
   if (fams.includes(d.c))
     r.push('من عائلة ' + CATS[d.c].n + ' التي اخترتها');
@@ -58,7 +74,7 @@ export function getReasons(d: Perfume, answers: string[]): string[] {
     evening: ['سهرة', 'موعد'],
     night: ['مناسبات', 'سهرة'],
   };
-  const occVal = answers[0];
+  const occVal = firstAnswer(answers);
   const tags = d.occ || [];
   if (
     occVal &&
@@ -72,12 +88,12 @@ export function getReasons(d: Perfume, answers: string[]): string[] {
   return r.slice(0, 2);
 }
 
-export function scorePerfume(d: Perfume, answers: string[]): number {
-  const a = answers.join(' ');
+export function scorePerfume(d: Perfume, answers: QuizAnswers): number {
+  const a = joined(answers);
   const notes = (d.notes || []).concat(d.anotes || []);
   const cat = d.c || '';
   let sc = 25;
-  const fams = answers.filter((av) => Object.keys(CATS).includes(av));
+  const fams = famsOf(answers);
 
   if (fams.includes(cat)) sc += 18;
 
@@ -106,7 +122,7 @@ export function scorePerfume(d: Perfume, answers: string[]): number {
     evening: ['سهرة', 'موعد'],
     night: ['مناسبات', 'سهرة'],
   };
-  const t = answers[0];
+  const t = firstAnswer(answers);
   const tags = d.occ || [];
   if (t && occMap[t] && occMap[t].some((o) => tags.includes(o))) {
     sc += 8;
@@ -148,7 +164,7 @@ export interface QuizResult {
 
 export function getResults(
   data: Perfume[],
-  answers: string[]
+  answers: QuizAnswers
 ): QuizResult[] {
   return data
     .map((d, i) => ({

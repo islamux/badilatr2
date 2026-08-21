@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { CATS, rawPerfumes, applyBoozy } from '@/data/perfumes';
 import { arN, norm } from '@/lib/arabic';
 import { applyOccasions } from '@/lib/catalog/occasions';
@@ -46,13 +46,6 @@ const TOP_RATED = PERFUMES.reduce((a, b) => (b.rate > a.rate ? b : a));
 const LONGEST = PERFUMES.reduce((a, b) => (b.pf > a.pf ? b : a));
 const TOP_SILLAGE = PERFUMES.reduce((a, b) => (b.ps > a.ps ? b : a));
 const ALT_COUNT = new Set(PERFUMES.map((d) => d.an)).size;
-
-const SIM_STYLES: Record<string, string> = {
-  'sim-twin': 'sim-twin',
-  'sim-strong': 'sim-strong',
-  'sim-close': 'sim-close',
-  'sim-vibe': 'sim-vibe',
-};
 
 const SELECT_CLS =
   'sortsel';
@@ -133,7 +126,8 @@ function PerfumeCard({
 
   return (
     <article
-      className="card"
+      id={'p-' + idx}
+      className="card in"
       data-cat={p.c}
       style={{ '--c1': cat?.c, '--c2': cat?.c2 } as React.CSSProperties}
     >
@@ -167,7 +161,7 @@ function PerfumeCard({
           <p className="pbrand">
             {p.br} · {p.bar}
             <span className="price">{p.price}</span>
-            <span className="rate">★ {p.rate}</span>
+            <span className="rate">★ {arDec(p.rate)}</span>
           </p>
         </div>
 
@@ -188,6 +182,16 @@ function PerfumeCard({
           {blindTag(p.bla)}
         </div>
 
+        {p.occ && p.occ.length > 0 && (
+          <div className="occtags">
+            {p.occ.map((o) => (
+              <span key={o} className="occtag">
+                {OCC_ICON[o]} {OCC_LABEL[o]}
+              </span>
+            ))}
+          </div>
+        )}
+
         <div className="altblock">
           <div className="alt-head">
             <span className="altpill">البديل المقترح</span>
@@ -195,6 +199,12 @@ function PerfumeCard({
             <small>
               {p.abr} · {p.abar}
             </small>
+            <span
+              className={'sim ' + tier.c}
+              title="درجة تشابه البديل مع الأصلي"
+            >
+              {tier.t} <b>{arN(p.sim ?? 75)}٪</b>
+            </span>
           </div>
           <div className="chips">
             {p.anotes.map((nt) => (
@@ -218,7 +228,34 @@ export default function Home() {
   const { state, update, reset } = useCatalogState();
   const { favs, toggle, count } = useFavorites();
   const [notesOpen, setNotesOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
   const glossary = useMemo(() => glossaryGroups(), []);
+
+  const activeFilterCount =
+    (state.blindOnly ? 1 : 0) +
+    (state.curBrand !== 'all' ? 1 : 0) +
+    (state.sortMode !== 'rank' ? 1 : 0) +
+    (state.curOcc !== 'all' ? 1 : 0) +
+    (state.curNote !== 'all' ? 1 : 0);
+
+  // Esc closes the filter sheet and the notes encyclopedia
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setPanelOpen(false);
+      setNotesOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Deep link from quiz results: scroll to #p-N card
+  useEffect(() => {
+    if (window.location.hash.startsWith('#p-')) {
+      const el = document.getElementById(window.location.hash.slice(1));
+      if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    }
+  }, []);
 
   const visible = useMemo(() => {
     const fs = { ...state, term: norm(state.term.trim()) };
@@ -360,7 +397,35 @@ export default function Home() {
               ✕
             </button>
           </div>
-          <div className="fpanel" id="sec" role="dialog" aria-label="الفلاتر">
+          <button
+            className={'fbadge' + (activeFilterCount > 0 ? ' has-f' : '')}
+            id="fbadge"
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded={panelOpen}
+            aria-controls="sec"
+            onClick={() => setPanelOpen((v) => !v)}
+          >
+            <span className="fgear">⚙</span>
+            <span className="ftxt">فلترة</span>
+            <span className="fdot">{arN(activeFilterCount)}</span>
+          </button>
+          <div
+            className={'fpanel' + (panelOpen ? ' open' : '')}
+            id="sec"
+            role="dialog"
+            aria-label="الفلاتر"
+          >
+            <div className="fpanel-h">
+              <b>الفلاتِر</b>
+              <button
+                type="button"
+                aria-label="إغلاق"
+                onClick={() => setPanelOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
             <label className="switch">
               <input
                 type="checkbox"

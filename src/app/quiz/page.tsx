@@ -60,7 +60,7 @@ export default function QuizPage() {
     if (step < questions.length - 1) {
       setStep(step + 1);
     } else {
-      setResults(getResults(DATA, answers as string[]));
+      setResults(getResults(DATA, answers as (string | string[])[]));
     }
   }, [canNext, step, answers]);
 
@@ -75,7 +75,7 @@ export default function QuizPage() {
   }, []);
 
   if (results) {
-    const name = profileName(answers as string[]);
+    const name = profileName(answers as (string | string[])[]);
     return (
       <div className="mx-auto max-w-[720px] px-5 py-10" dir="rtl">
         <div className="mb-6 flex items-center gap-3">

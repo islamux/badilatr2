@@ -1219,6 +1219,25 @@ footer ul {
 }
 
 /* ===== Similarity badges ===== */
+.sim {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: 99px;
+  margin-inline-start: auto;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+.sim b {
+  font-size: 0.64rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
 .sim-twin {
   color: #ffd98a;
   background: rgba(212,162,78,0.15);
@@ -1408,6 +1427,120 @@ footer ul {
   font-size: 0.76rem;
   color: var(--mut);
   line-height: 1.7;
+}
+
+/* ===== Occasion tags on cards ===== */
+.occtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 7px;
+}
+
+.occtag {
+  font-size: 0.64rem;
+  padding: 1px 8px;
+  border-radius: 99px;
+  background: rgba(122,134,214,0.13);
+  border: 1px solid rgba(140,152,224,0.32);
+  color: #b3bcf5;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+/* ===== Mobile filter badge + sheet header ===== */
+.fbadge {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  background: #241811;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.25s;
+  flex-shrink: 0;
+}
+
+.fbadge:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.fbadge .fgear {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.fdot {
+  display: none;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--gold);
+  color: #171009;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 20px;
+  text-align: center;
+}
+
+.fbadge.has-f .fdot {
+  display: inline-block;
+}
+
+.fpanel-h {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .fbadge {
+    display: inline-flex;
+  }
+  .fpanel-h {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .fpanel-h b {
+    font-family: 'Aref Ruqaa';
+    font-size: 1.3rem;
+    color: var(--gold);
+  }
+  .fpanel-h button {
+    background: none;
+    border: none;
+    color: var(--mut);
+    font-size: 1.15rem;
+    cursor: pointer;
+    padding: 2px 8px;
+    line-height: 1;
+  }
+  .fpanel .switch {
+    font-size: 0.95rem;
+    padding: 2px 0;
+  }
+  .fpanel .sw {
+    width: 44px;
+    height: 24px;
+  }
+  .fpanel .switch input:checked + .sw::after {
+    inset-inline-start: 24px;
+  }
+  .fpanel .sortsel {
+    width: 100%;
+    padding: 13px 14px;
+    font-size: 0.95rem;
+  }
+  .reset {
+    display: inline-flex;
+    align-self: flex-start;
+  }
 }
 
 /* ===== Reduced motion ===== */
