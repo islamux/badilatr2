@@ -1261,6 +1261,155 @@ footer ul {
   margin-top: 8px;
 }
 
+/* ===== Notes encyclopedia ===== */
+.notebtn {
+  background: rgba(122,134,214,0.15);
+  border: 1px solid rgba(140,152,224,0.4);
+  color: #b3bcf5;
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  transition: 0.25s;
+  white-space: nowrap;
+}
+
+.notebtn:hover {
+  background: rgba(122,134,214,0.3);
+  transform: translateY(-1px);
+}
+
+.notemodal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(10,6,3,0.85);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+
+.notemodal.open {
+  display: flex;
+}
+
+.notemodal-inner {
+  width: 100%;
+  max-width: 880px;
+  background: #1e140b;
+  border: 1px solid rgba(212,162,78,0.25);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+
+.notemodal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(212,162,78,0.15);
+  position: sticky;
+  top: 0;
+  background: #1e140b;
+  z-index: 2;
+}
+
+.notemodal-head h3 {
+  font-family: 'Aref Ruqaa';
+  color: var(--gold);
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.noteclose {
+  background: none;
+  border: none;
+  color: var(--mut);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+.noteclose:hover {
+  color: var(--ink);
+  background: rgba(255,255,255,0.06);
+}
+
+.notemodal-body {
+  padding: 20px 24px;
+}
+
+.notecat-title {
+  font-family: 'Aref Ruqaa';
+  color: var(--gold);
+  font-size: 1.05rem;
+  margin: 20px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(212,162,78,0.2);
+}
+
+.notecat-title:first-child {
+  margin-top: 0;
+}
+
+.notegrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 10px;
+}
+
+.note-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(212,162,78,0.14);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.note-card:hover {
+  border-color: rgba(140,152,224,0.5);
+  background: rgba(122,134,214,0.08);
+  transform: translateY(-2px);
+}
+
+.note-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.note-card-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.note-card-count {
+  margin-inline-start: auto;
+  font-size: 0.68rem;
+  color: var(--gold);
+  background: rgba(212,162,78,0.12);
+  border: 1px solid rgba(212,162,78,0.3);
+  padding: 1px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.note-card-desc {
+  font-size: 0.76rem;
+  color: var(--mut);
+  line-height: 1.7;
+}
+
 /* ===== Reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {
   * {

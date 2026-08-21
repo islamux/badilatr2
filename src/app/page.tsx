@@ -1,13 +1,13 @@
 'use client';
 
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { CATS, rawPerfumes, applyBoozy } from '@/data/perfumes';
 import { arN, norm } from '@/lib/arabic';
 import { applyOccasions } from '@/lib/catalog/occasions';
 import { assignScores, tierOf } from '@/lib/catalog/similarity';
 import { buildHaystacks, matches } from '@/lib/catalog/filter';
 import { sortBy } from '@/lib/catalog/sort';
-import { NOTES_DB } from '@/lib/catalog/notes';
+import { NOTES_DB, populateNotes, glossaryGroups } from '@/lib/catalog/notes';
 import { OCCS, OCC_ICON, OCC_LABEL } from '@/lib/catalog/occasions';
 import type { Perfume, SortMode } from '@/domain/types';
 import { useCatalogState } from '@/hooks/useCatalogState';
@@ -17,6 +17,7 @@ import { BottleBig, BottleMini } from '@/components/catalog/Bottle';
 const PERFUMES: Perfume[] = applyBoozy(rawPerfumes);
 applyOccasions(PERFUMES);
 assignScores(PERFUMES);
+populateNotes(PERFUMES);
 
 const HAYSTACKS = buildHaystacks(PERFUMES);
 const CAT_KEYS = Object.keys(CATS);
@@ -216,6 +217,8 @@ function PerfumeCard({
 export default function Home() {
   const { state, update, reset } = useCatalogState();
   const { favs, toggle, count } = useFavorites();
+  const [notesOpen, setNotesOpen] = useState(false);
+  const glossary = useMemo(() => glossaryGroups(), []);
 
   const visible = useMemo(() => {
     const fs = { ...state, term: norm(state.term.trim()) };
@@ -408,6 +411,14 @@ export default function Home() {
                 </option>
               ))}
             </select>
+            <button
+              className="notebtn"
+              id="notebtn"
+              type="button"
+              onClick={() => setNotesOpen(true)}
+            >
+              📖 موسوعة النوتات
+            </button>
             <button className="reset" id="reset" type="button" onClick={reset}>
               ↺ إعادة ضبط الفلاتر
             </button>
@@ -515,6 +526,47 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {notesOpen && (
+        <div className="notemodal open" onClick={(e) => {
+          if (e.target === e.currentTarget) setNotesOpen(false);
+        }}>
+          <div className="notemodal-inner">
+            <div className="notemodal-head">
+              <h3>موسوعة النوتات العطرية</h3>
+              <button className="noteclose" type="button" onClick={() => setNotesOpen(false)}>
+                ✕
+              </button>
+            </div>
+            <div className="notemodal-body">
+              {glossary.map((group) => (
+                <div key={group.cat}>
+                  <div className="notecat-title">{group.cat}</div>
+                  <div className="notegrid">
+                    {group.items.map((nt) => (
+                      <div
+                        key={nt.n}
+                        className="note-card"
+                        onClick={() => {
+                          update('curNote', nt.n);
+                          setNotesOpen(false);
+                        }}
+                      >
+                        <div className="note-card-top">
+                          <span>{nt.icon}</span>
+                          <span className="note-card-name">{nt.n}</span>
+                          <span className="note-card-count">{arN(nt.count ?? 0)} عطراً</span>
+                        </div>
+                        <div className="note-card-desc">{nt.d}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

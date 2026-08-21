@@ -80,3 +80,11 @@ export function notesOptionsHtml(): string {
 export function isValid(name: string): boolean {
   return NOTES_DB.some((nt) => nt.n === name);
 }
+
+/** Get notes grouped by category, sorted by count within each group */
+export function glossaryGroups(): { cat: string; items: NoteEntry[] }[] {
+  const present = getPresentNotes();
+  return CAT_ORDER
+    .map((c) => ({ cat: c, items: present.filter((nt) => nt.cat === c) }))
+    .filter((g) => g.items.length > 0);
+}
