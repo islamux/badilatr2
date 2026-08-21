@@ -2,22 +2,20 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { CATS, rawPerfumes, applyBoozy } from '@/data/perfumes';
-import { arN, norm } from '@/lib/arabic';
-import { applyOccasions } from '@/lib/catalog/occasions';
-import { assignScores, tierOf } from '@/lib/catalog/similarity';
+import { CATS } from '@/data/perfumes';
+import { arN, arDec, norm } from '@/lib/arabic';
+import { tierOf } from '@/lib/catalog/similarity';
 import { buildHaystacks, matches } from '@/lib/catalog/filter';
 import { sortBy } from '@/lib/catalog/sort';
 import { NOTES_DB, populateNotes, glossaryGroups } from '@/lib/catalog/notes';
 import { OCCS, OCC_ICON, OCC_LABEL } from '@/lib/catalog/occasions';
+import { initCatalogData } from '@/lib/catalog/init';
 import type { Perfume, SortMode } from '@/domain/types';
 import { useCatalogState } from '@/hooks/useCatalogState';
 import { useFavorites } from '@/hooks/useFavorites';
 import { BottleBig, BottleMini } from '@/components/catalog/Bottle';
 
-const PERFUMES: Perfume[] = applyBoozy(rawPerfumes);
-applyOccasions(PERFUMES);
-assignScores(PERFUMES);
+const PERFUMES = initCatalogData();
 populateNotes(PERFUMES);
 
 const HAYSTACKS = buildHaystacks(PERFUMES);
@@ -47,13 +45,6 @@ const TOP_RATED = PERFUMES.reduce((a, b) => (b.rate > a.rate ? b : a));
 const LONGEST = PERFUMES.reduce((a, b) => (b.pf > a.pf ? b : a));
 const TOP_SILLAGE = PERFUMES.reduce((a, b) => (b.ps > a.ps ? b : a));
 const ALT_COUNT = new Set(PERFUMES.map((d) => d.an)).size;
-
-const SELECT_CLS =
-  'sortsel';
-
-function arDec(n: number): string {
-  return arN(n.toFixed(1)).replace('.', '٫');
-}
 
 function bottleCode(br: string): string {
   return (
@@ -441,7 +432,7 @@ export default function Home() {
             </label>
             <select
               id="sort"
-              className={SELECT_CLS}
+              className="sortsel"
               aria-label="ترتيب العطور"
               value={state.sortMode}
               onChange={(e) => update('sortMode', e.target.value as SortMode)}
@@ -454,7 +445,7 @@ export default function Home() {
             </select>
             <select
               id="brand"
-              className={SELECT_CLS}
+              className="sortsel"
               aria-label="فلتر بحسب الدار المنتجة"
               value={state.curBrand}
               onChange={(e) => update('curBrand', e.target.value)}
@@ -468,7 +459,7 @@ export default function Home() {
             </select>
             <select
               id="noteselect"
-              className={SELECT_CLS}
+              className="sortsel"
               aria-label="فلتر بحسب النوتة"
               value={state.curNote}
               onChange={(e) => update('curNote', e.target.value)}
@@ -509,6 +500,9 @@ export default function Home() {
           <div className="chips-row">
             <Chip active={state.curCat === 'all'} onClick={() => update('curCat', 'all')}>
               الكل
+            </Chip>
+            <Chip active={state.favOnly} onClick={() => update('favOnly', !state.favOnly)}>
+              ♥ المفضلة {count > 0 && `(${arN(count)})`}
             </Chip>
             {CAT_KEYS.map((k) => (
               <Chip key={k} active={state.curCat === k} onClick={() => update('curCat', k)}>
@@ -597,7 +591,7 @@ export default function Home() {
       </footer>
 
       {notesOpen && (
-        <div className="notemodal open" onClick={(e) => {
+        <div className="notemodal open" role="dialog" aria-modal="true" aria-label="موسوعة النوتات" onClick={(e) => {
           if (e.target === e.currentTarget) setNotesOpen(false);
         }}>
           <div className="notemodal-inner">

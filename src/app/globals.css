@@ -502,24 +502,7 @@ h1 span {
   display: flex;
 }
 
-.search::after {
-  content: '';
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline-start: 14px;
-  width: calc(var(--qfill, 0) * 100%);
-  max-width: calc(100% - 28px);
-  height: 2px;
-  background: linear-gradient(90deg, var(--gold), transparent);
-  border-radius: 2px;
-  opacity: 0;
-  transition: opacity 0.35s;
-  pointer-events: none;
-}
 
-.search.has-q::after {
-  opacity: 0.55;
-}
 
 .switch {
   display: flex;
@@ -761,6 +744,48 @@ h1 span {
   }
   .count {
     font-size: 0.74rem;
+  }
+  .fbadge {
+    display: inline-flex;
+  }
+  .fpanel-h {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .fpanel-h b {
+    font-family: 'Aref Ruqaa';
+    font-size: 1.3rem;
+    color: var(--gold);
+  }
+  .fpanel-h button {
+    background: none;
+    border: none;
+    color: var(--mut);
+    font-size: 1.15rem;
+    cursor: pointer;
+    padding: 2px 8px;
+    line-height: 1;
+  }
+  .fpanel .switch {
+    font-size: 0.95rem;
+    padding: 2px 0;
+  }
+  .fpanel .sw {
+    width: 44px;
+    height: 24px;
+  }
+  .fpanel .switch input:checked + .sw::after {
+    inset-inline-start: 24px;
+  }
+  .fpanel .sortsel {
+    width: 100%;
+    padding: 13px 14px;
+    font-size: 0.95rem;
+  }
+  .reset {
+    display: inline-flex;
+    align-self: flex-start;
   }
 }
 
@@ -1515,51 +1540,6 @@ footer ul {
 
 .fpanel-h {
   display: none;
-}
-
-@media (max-width: 760px) {
-  .fbadge {
-    display: inline-flex;
-  }
-  .fpanel-h {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .fpanel-h b {
-    font-family: 'Aref Ruqaa';
-    font-size: 1.3rem;
-    color: var(--gold);
-  }
-  .fpanel-h button {
-    background: none;
-    border: none;
-    color: var(--mut);
-    font-size: 1.15rem;
-    cursor: pointer;
-    padding: 2px 8px;
-    line-height: 1;
-  }
-  .fpanel .switch {
-    font-size: 0.95rem;
-    padding: 2px 0;
-  }
-  .fpanel .sw {
-    width: 44px;
-    height: 24px;
-  }
-  .fpanel .switch input:checked + .sw::after {
-    inset-inline-start: 24px;
-  }
-  .fpanel .sortsel {
-    width: 100%;
-    padding: 13px 14px;
-    font-size: 0.95rem;
-  }
-  .reset {
-    display: inline-flex;
-    align-self: flex-start;
-  }
 }
 
 /* ===== Reduced motion ===== */

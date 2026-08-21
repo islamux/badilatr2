@@ -1,20 +1,9 @@
 'use client';
 import { useState, useCallback, useEffect } from 'react';
-import type { SortMode } from '@/domain/types';
+import type { FilterState } from '@/domain/types';
 import { loadState, applyHash, saveHash } from '@/lib/catalog/state';
 
-export interface CatalogState {
-  term: string;
-  sortMode: SortMode;
-  favOnly: boolean;
-  curBrand: string;
-  curCat: string;
-  curOcc: string;
-  curNote: string;
-  blindOnly: boolean;
-}
-
-const INITIAL: CatalogState = {
+const INITIAL: FilterState = {
   term: '',
   sortMode: 'rank',
   favOnly: false,
@@ -26,7 +15,7 @@ const INITIAL: CatalogState = {
 };
 
 export function useCatalogState() {
-  const [state, setState] = useState<CatalogState>(INITIAL);
+  const [state, setState] = useState<FilterState>(INITIAL);
   const [ready, setReady] = useState(false);
 
   // Restore state from URL hash once after mount (client-only, avoids hydration mismatch)
@@ -66,7 +55,7 @@ export function useCatalogState() {
   }, [state, ready]);
 
   const update = useCallback(
-    <K extends keyof CatalogState>(key: K, value: CatalogState[K]) => {
+    <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
       setState((prev) => ({ ...prev, [key]: value }));
     },
     []
