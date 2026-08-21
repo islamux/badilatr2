@@ -13,11 +13,9 @@ function loadFavs(): Set<number> {
 
 export function useFavorites() {
   const [favs, setFavs] = useState<Set<number>>(new Set());
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     setFavs(loadFavs());
-    setLoaded(true);
   }, []);
 
   const toggle = useCallback((i: number) => {
@@ -29,7 +27,5 @@ export function useFavorites() {
     });
   }, []);
 
-  const has = useCallback((i: number) => favs.has(i), [favs]);
-
-  return { favs, toggle, has, loaded, count: favs.size };
+  return { favs, toggle, count: favs.size };
 }
