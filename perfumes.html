@@ -1866,13 +1866,12 @@ App.Boot=(function(){
 /* ===== ScentQuiz: اختبار بصمتك العطرية — يعمل محلياً بلا إنترنت ===== */
 App.ScentQuiz=(function(){
  var modal=document.getElementById('quizModal'),root=document.getElementById('quizApp'),step=0,answers=[];
+ var QICON={woody:'🪵',oriental:'🔥',citrus:'🍋',aromatic:'🌿',aquatic:'🌊',leather:'👞',spicy:'🌶️',floral:'🌸',gourmand:'🍰',fougere:'💈',boozy:'🍷'};
  var questions=[
-  {t:'متى تريد استخدام عطرك غالباً؟',d:'اختر الوقت الذي تتخيل فيه نفسك ترتدي العطر.',o:[
-   ['☀️','صباحاً ونهاراً','morning'],['💼','دوام ومكتب','work'],['🌆','مساءً','evening'],['🌙','سهرات ومناسبات','night']]},
-  {t:'أين ستكون عطرك زميلك؟',d:'اختر المكان الذي ستستمتع فيه بالعطر.',o:[
-   ['🏠','يومي ومنزلي','daily'],['🏢','مكتب وعمل','office'],['🚶','خروج وتمشي','out'],['🎉','سهرة واحتفال','party']]},
-  {t:'ما الطابع العطري الذي يجذبك؟',d:'يمكنك اختيار خيارين كحد أقصى.',multi:true,max:2,
-   o:[['🌊','منعش ومائي','fresh'],['🪵','خشبي وطبيعي','woody'],['🔥','شرقي ودافئ','oriental'],['🍰','حلو وجورماند','gourmand'],['🪨','جلدي ودخاني','leather'],['🍷','بوزي وكحولي','boozy']]},
+  {t:'متى وأين ستلبس عطرك أكثر؟',d:'اختر وقت ومكان الاستخدام الذي تخيله.',o:[
+   ['🌅','صباحاً ويومياً','daily'],['💼','دوام ومكتب','work'],['🌙','مساءً ومواعيد','evening'],['🎉','سهرات ومناسبات','night']]},
+  {t:'أي عائلة عطرية تجرّبك؟',d:'يمكنك اختيار عائلتين كحد أقصى.',multi:true,max:2,
+   o:Object.keys(CATS).map(function(k){return [QICON[k]||'✦',CATS[k].n,k];})},
   {t:'كيف تريد حضور عطرك؟',d:'اختر مستوى القوة الذي ترتاح له.',o:[
    ['🤫','هادئ وقريب','soft'],['👌','متوازن وواضح','mid'],['💨','فواح ولافت','strong']]},
   {t:'أي نوتة تفضل أن تكون واضحة؟',d:'يمكنك اختيار خيارين كحد أقصى.',multi:true,max:2,
@@ -1882,44 +1881,54 @@ App.ScentQuiz=(function(){
   {t:'أي طقس يمثل عطرك المثالي؟',d:'فكّر في الأجواء التي تريد فيها أن يلمع العطر.',o:[
    ['🔥','حر وصيف','hot'],['🌤️','معتدل','mild'],['🌧️','بارد وممطر','cold'],['❄️','شتاء قوي','winter']]}
  ];
- var catMap={fresh:['citrus','aquatic','aromatic'],woody:['woody','fougere'],oriental:['oriental'],gourmand:['gourmand'],leather:['leather','spicy'],boozy:['boozy','floral']};
  var noteMap={musk:['مسك','نظيف','لافندر'],citrus:['ليمون','برغموت','جريب فروت','برتقال','نعناع'],spice:['فلفل','توابل','هيل','قرفة','زنجبيل'],wood:['عود','خشب','أرز','صندل','باتشولي'],vanilla:['فانيليا','كراميل','شوكولاتة','تونكا','عسل'],smoke:['بخور','دخان','تبغ','قطران']};
  var QLABEL={};
  questions.forEach(function(q){q.o.forEach(function(o){QLABEL[o[2]]=o[1];});});
- function profileName(a){if(/gourmand|vanilla|sweet/.test(a))return 'الجورماند الدافئ';if(/fresh|hot/.test(a))return 'المنعش المضيء';if(/leather|smoke|boozy/.test(a))return 'الشرقي الجريء';if(/woody|mild/.test(a))return 'الخشبي الأنيق';if(/musk|soft/.test(a))return 'النظيف العصري';return 'المتوازن الأنيق';}
-  function reasons(d,a,sc){
-   var r=[],all=String(a),notes=(d.notes||[]).concat(d.anotes||[]);
-  Object.keys(catMap).forEach(function(k){if(all.indexOf(k)>-1&&catMap[k].indexOf(d.c)>-1)r.push('يناسب طابعك: '+(QLABEL[k]||k));});
+ function profileName(a){if(/gourmand|vanilla|sweet/.test(a))return 'الجورماند الدافئ';if(/citrus|aromatic|aquatic|hot/.test(a))return 'المنعش المضيء';if(/leather|spicy|smoke|boozy/.test(a))return 'الشرقي الجريء';if(/woody|fougere|mild/.test(a))return 'الخشبي الأنيق';if(/floral/.test(a))return 'الزهري الأنيق';if(/musk|soft|aromatic/.test(a))return 'النظيف العصري';return 'المتوازن الأنيق';}
+function reasons(d,a,sc){
+  var r=[],all=String(a),notes=(d.notes||[]).concat(d.anotes||[]),fams=(answers[1]||[]);
+  if(fams.indexOf(d.c)>-1)r.push('من عائلة '+CATS[d.c].n+' التي اخترتها');
   Object.keys(noteMap).forEach(function(k){if(all.indexOf(k)>-1&&noteMap[k].some(function(x){return notes.join(' ').indexOf(x)>-1;}))r.push('نوتة تحبها: '+(QLABEL[k]||k));});
   if(all.indexOf('soft')>-1&&d.ps<=60)r.push('فوحانه هادئ ومناسب');
   if(all.indexOf('strong')>-1&&d.ps>=75)r.push('فوحانه قوي ولافت');
   if(all.indexOf('hot')>-1&&['citrus','aquatic','aromatic'].indexOf(d.c)>-1)r.push('مناسب للصيف والحر');
   if((all.indexOf('cold')>-1||all.indexOf('winter')>-1)&&['woody','oriental','gourmand'].indexOf(d.c)>-1)r.push('دافئ ومناسب للشتاء');
   if(all.indexOf('dry')>-1&&d.c==='gourmand')r.push('جورماند لكن بلمسة جافة');
+  var occm={daily:['يومي'],work:['مكتب'],evening:['سهرة','موعد'],night:['مناسبات','سهرة']};
+  var t=answers[0],tags=(d.occ||[]);
+   if(t&&occm[t]&&occm[t].some(function(o){return tags.indexOf(o)>-1;}))r.push('موسوم لـ'+App.Occ.LABEL[occm[t][0]]);
   if(r.length===0)r.push('متوافق مع ذوقك العام');
   return r.slice(0,2);
- }
- function score(d,i){
-  var a=answers.join(' '),notes=(d.notes||[]).concat(d.anotes||[]),cat=d.c||'',sc=25;
-  Object.keys(catMap).forEach(function(k){if(a.indexOf(k)>-1&&catMap[k].indexOf(cat)>-1)sc+=18;});
-  Object.keys(noteMap).forEach(function(k){if(a.indexOf(k)>-1&&noteMap[k].some(function(x){return notes.join(' ').indexOf(x)>-1;}))sc+=7;});
-  if(a.indexOf('strong')>-1)sc+=(d.ps>=75?9:-2);
-  if(a.indexOf('soft')>-1)sc+=(d.ps<=60?9:-2);
-  if(a.indexOf('mid')>-1&&d.ps>55&&d.ps<82)sc+=6;
-  if(a.indexOf('dry')>-1&&cat==='gourmand')sc-=6;
-  if(a.indexOf('sweet')>-1&&['gourmand','oriental'].indexOf(cat)>-1)sc+=7;
-  if(a.indexOf('light')>-1&&['gourmand','oriental'].indexOf(cat)>-1)sc-=3;
-  if(a.indexOf('hot')>-1&&['citrus','aquatic','aromatic'].indexOf(cat)>-1)sc+=8;
-  if((a.indexOf('cold')>-1||a.indexOf('winter')>-1)&&['woody','oriental','gourmand'].indexOf(cat)>-1)sc+=8;
-  if(a.indexOf('morning')>-1&&['citrus','aquatic','aromatic'].indexOf(cat)>-1)sc+=5;
-  if(a.indexOf('evening')>-1&&['woody','oriental'].indexOf(cat)>-1)sc+=5;
-  if(a.indexOf('night')>-1&&['oriental','gourmand','boozy'].indexOf(cat)>-1)sc+=6;
-  if(a.indexOf('work')>-1&&['aromatic','citrus','fougere'].indexOf(cat)>-1)sc+=5;
-  if(a.indexOf('daily')>-1&&d.bl)sc+=3;
-  if(a.indexOf('party')>-1&&d.ps>=70)sc+=4;
+}
+function score(d,i){
+  var a=answers.join(' '),notes=(d.notes||[]).concat(d.anotes||[]),cat=d.c||'',sc=25,fams=(answers[1]||[]);
+  if(fams.indexOf(cat)>-1)sc+=18;
+  Object.keys(noteMap).forEach(function(k){if(answers.join(' ').indexOf(k)>-1&&noteMap[k].some(function(x){return notes.join(' ').indexOf(x)>-1;}))sc+=7;});
+  if(answers.join(' ').indexOf('strong')>-1)sc+=(d.ps>=75?9:-2);
+  if(answers.join(' ').indexOf('soft')>-1)sc+=(d.ps<=60?9:-2);
+  if(answers.join(' ').indexOf('mid')>-1&&d.ps>55&&d.ps<82)sc+=6;
+  if(answers.join(' ').indexOf('dry')>-1&&cat==='gourmand')sc-=6;
+  if(answers.join(' ').indexOf('sweet')>-1&&['gourmand','oriental'].indexOf(cat)>-1)sc+=7;
+  if(answers.join(' ').indexOf('light')>-1&&['gourmand','oriental'].indexOf(cat)>-1)sc-=3;
+  if(answers.join(' ').indexOf('hot')>-1&&['citrus','aquatic','aromatic'].indexOf(cat)>-1)sc+=8;
+  if((answers.join(' ').indexOf('cold')>-1||answers.join(' ').indexOf('winter')>-1)&&['woody','oriental','gourmand'].indexOf(cat)>-1)sc+=8;
+  var occm={daily:['يومي'],work:['مكتب'],evening:['سهرة','موعد'],night:['مناسبات','سهرة']};
+  var t=answers[0],tags=(d.occ||[]);
+  if(t&&occm[t]&&occm[t].some(function(o){return tags.indexOf(o)>-1;}))sc+=8;
+  else{
+   if(answers.join(' ').indexOf('morning')>-1&&['citrus','aquatic','aromatic'].indexOf(cat)>-1)sc+=5;
+   if(answers.join(' ').indexOf('evening')>-1&&['woody','oriental'].indexOf(cat)>-1)sc+=5;
+   if(answers.join(' ').indexOf('night')>-1&&['oriental','gourmand','boozy'].indexOf(cat)>-1)sc+=6;
+   if(answers.join(' ').indexOf('work')>-1&&['aromatic','citrus','fougere'].indexOf(cat)>-1)sc+=5;
+   if(answers.join(' ').indexOf('daily')>-1&&d.bl)sc+=3;
+   if(answers.join(' ').indexOf('party')>-1&&d.ps>=70)sc+=4;
+  }
+  var tags2=(d.occ||[]);
+  if(answers.join(' ').indexOf('hot')>-1&&tags2.indexOf('صيف')>-1)sc+=4;
+  if((answers.join(' ').indexOf('cold')>-1||answers.join(' ').indexOf('winter')>-1)&&tags2.indexOf('شتاء')>-1)sc+=4;
   sc+=Math.round((d.rate-4)*8);
   return Math.max(25,Math.min(97,Math.round(sc)));
- }
+}
  function render(){
   if(step>=questions.length){result();return;}
   var q=questions[step],chosen=answers[step]||(q.multi?[]:null);
