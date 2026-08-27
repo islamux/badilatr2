@@ -2,17 +2,12 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { rawPerfumes, applyBoozy } from '@/data/perfumes';
-import { applyOccasions } from '@/lib/catalog/occasions';
-import { assignScores } from '@/lib/catalog/similarity';
 import { arN } from '@/lib/arabic';
 import { questions } from '@/lib/quiz/questions';
 import { profileName, getResults, type QuizResult } from '@/lib/quiz/scoring';
-import type { Perfume } from '@/domain/types';
+import { initCatalogData } from '@/lib/catalog/init';
 
-const DATA: Perfume[] = applyBoozy(rawPerfumes);
-applyOccasions(DATA);
-assignScores(DATA);
+const DATA = initCatalogData();
 
 export default function QuizPage() {
   const [step, setStep] = useState(0);

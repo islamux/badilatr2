@@ -9,6 +9,13 @@ questions.forEach((q) =>
   })
 );
 
+const OCC_MAP: Record<string, string[]> = {
+  daily: ['يومي'],
+  work: ['مكتب'],
+  evening: ['سهرة', 'موعد'],
+  night: ['مناسبات', 'سهرة'],
+};
+
 /** Quiz answers: single-answer questions are strings, multi-select ones arrays (Q2 families, Q4 notes). */
 export type QuizAnswers = (string | string[])[];
 
@@ -68,20 +75,14 @@ export function getReasons(d: Perfume, answers: QuizAnswers): string[] {
     r.push('دافئ ومناسب للشتاء');
   if (all.includes('dry') && d.c === 'gourmand') r.push('جورماند لكن بلمسة جافة');
 
-  const occMap: Record<string, string[]> = {
-    daily: ['يومي'],
-    work: ['مكتب'],
-    evening: ['سهرة', 'موعد'],
-    night: ['مناسبات', 'سهرة'],
-  };
   const occVal = firstAnswer(answers);
   const tags = d.occ || [];
   if (
     occVal &&
-    occMap[occVal] &&
-    occMap[occVal].some((o) => tags.includes(o))
+    OCC_MAP[occVal] &&
+    OCC_MAP[occVal].some((o) => tags.includes(o))
   ) {
-    r.push('موسوم لـ' + occMap[occVal][0]);
+    r.push('موسوم لـ' + OCC_MAP[occVal][0]);
   }
 
   if (r.length === 0) r.push('متوافق مع ذوقك العام');
@@ -116,32 +117,10 @@ export function scorePerfume(d: Perfume, answers: QuizAnswers): number {
   )
     sc += 8;
 
-  const occMap: Record<string, string[]> = {
-    daily: ['يومي'],
-    work: ['مكتب'],
-    evening: ['سهرة', 'موعد'],
-    night: ['مناسبات', 'سهرة'],
-  };
   const t = firstAnswer(answers);
   const tags = d.occ || [];
-  if (t && occMap[t] && occMap[t].some((o) => tags.includes(o))) {
+  if (t && OCC_MAP[t] && OCC_MAP[t].some((o) => tags.includes(o))) {
     sc += 8;
-  } else {
-    if (a.includes('morning') && ['citrus', 'aquatic', 'aromatic'].includes(cat))
-      sc += 5;
-    if (a.includes('evening') && ['woody', 'oriental'].includes(cat)) sc += 5;
-    if (
-      a.includes('night') &&
-      ['oriental', 'gourmand', 'boozy'].includes(cat)
-    )
-      sc += 6;
-    if (
-      a.includes('work') &&
-      ['aromatic', 'citrus', 'fougere'].includes(cat)
-    )
-      sc += 5;
-    if (a.includes('daily') && d.bl) sc += 3;
-    if (a.includes('party') && d.ps >= 70) sc += 4;
   }
 
   if (a.includes('hot') && tags.includes('صيف')) sc += 4;

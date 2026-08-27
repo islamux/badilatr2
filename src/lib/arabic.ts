@@ -5,6 +5,11 @@ export function arN(n: number | string): string {
   return String(n).replace(/\d/g, (d) => AR[+d]);
 }
 
+/** Format a number with Arabic-Indic decimal */
+export function arDec(n: number): string {
+  return arN(n.toFixed(1)).replace('.', '٫');
+}
+
 /** Normalize Arabic text for search: remove diacritics, unify alef/ta-marbuta/yaa */
 export function norm(s: string): string {
   return s

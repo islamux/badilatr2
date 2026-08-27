@@ -62,18 +62,10 @@ export function populateNotes(data: { notes: string[] }[]): void {
 }
 
 /** Get notes sorted by usage count (only present ones) */
-export function getPresentNotes(): NoteEntry[] {
+function getPresentNotes(): NoteEntry[] {
   return NOTES_DB.filter((nt) => (nt.count ?? 0) > 0).sort(
     (a, b) => (b.count ?? 0) - (a.count ?? 0)
   );
-}
-
-/** Build <option> HTML for note select dropdown */
-export function notesOptionsHtml(): string {
-  const sorted = getPresentNotes();
-  return sorted
-    .map((nt) => '<option value="' + nt.n + '">' + nt.icon + ' ' + nt.n + ' (' + String(nt.count ?? 0) + ')</option>')
-    .join('');
 }
 
 /** Check if a note name is valid */
