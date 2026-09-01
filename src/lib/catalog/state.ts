@@ -1,7 +1,10 @@
-import { CATS } from '@/data/perfumes';
-import { OCCS, lookupOccasions } from '@/lib/catalog/occasions';
+import { CATS, rawPerfumes } from '@/data/perfumes';
+import { OCCS } from '@/lib/catalog/occasions';
 import { isValid as isNoteValid } from '@/lib/catalog/notes';
 import type { SortMode } from '@/domain/types';
+
+/** Set of valid brand keys (from raw data) used to validate the #brand hash param */
+const BRAND_SET = new Set(rawPerfumes.map((d) => d.br));
 
 /** Parse hash into state params */
 export function loadState(): Record<string, string> {
@@ -12,7 +15,14 @@ export function loadState(): Record<string, string> {
     .split('&')
     .forEach((p) => {
       const s = p.split('=');
-      if (s[0]) kv[s[0]] = decodeURIComponent(s.slice(1).join('='));
+      if (!s[0]) return;
+      let val = '';
+      try {
+        val = decodeURIComponent(s.slice(1).join('='));
+      } catch {
+        val = s.slice(1).join('=');
+      }
+      kv[s[0]] = val;
     });
   return kv;
 }
@@ -53,7 +63,8 @@ export function applyHash(
   if (kv.blind === '1') set('blindOnly', true);
   if (['rank', 'rate', 'pf', 'ps', 'price', 'name'].includes(kv.sort))
     set('sortMode', kv.sort);
-  if (typeof kv.brand === 'string') set('curBrand', kv.brand);
+  if (typeof kv.brand === 'string' && BRAND_SET.has(kv.brand))
+    set('curBrand', kv.brand);
   if (kv.fav === '1') set('favOnly', true);
   if (OCCS.includes(kv.occ as never)) set('curOcc', kv.occ);
   if (typeof kv.note === 'string' && isNoteValid(kv.note))
