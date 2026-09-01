@@ -41,7 +41,8 @@ npx serve out -l 3001   # أو python3 -m http.server 3001 -d out — معاين
 | `src/app/layout.tsx` | الجذر: RTL، الميتا، الفافيكون |
 | `src/app/globals.css` | خطوط محلية (`public/fonts/` مع بديل Google)، متغيرات الألوان، كل أنماط الواجهة (منقولة من القديم بأسمائها: `.card`/`.stage`/`.toolbar`/`.fpanel`…) |
 | `src/app/page.tsx` | صفحة الفهرس: الترويسة، شريط الأدوات، الأقسام، بطاقات العطور، موسوعة النوتات |
-| `src/app/quiz/page.tsx` | صفحة الاختبار المستقلة (٦ أسئلة + النتائج) |
+| `src/app/quiz/page.tsx` | غلاف الخادم للميتا (العنوان/الوصف) لصفحة الاختبار |
+| `src/app/quiz/QuizClient.tsx` | مكوّن الاختبار التفاعلي (٦ أسئلة + النتائج) |
 | `src/domain/types.ts` | الأنواع: `Perfume`, `Category`, `FilterState`, `Occasion`, `SortMode` |
 | `src/data/perfumes.ts` | `CATS` (١١ عائلة)، `rawPerfumes` (**٥٦٩ سجلاً**)، `applyBoozy` |
 | `src/lib/arabic.ts` | `arN`/`norm`/`normAr`/`normEn`/`priceRank` — المصدر الموحّد الوحيد |

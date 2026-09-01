@@ -86,7 +86,7 @@ export function BottleBig({ idx, c1, c2, code, variant }: BottleProps) {
   );
 }
 
-export function BottleMini(_props: BottleProps) {
+export function BottleMini() {
   return (
     <svg viewBox="0 0 40 56" className="mini" aria-hidden="true">
       <rect x="15" y="1" width="10" height="9" rx="2" fill="#9fb7ad" />

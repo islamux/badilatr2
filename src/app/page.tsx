@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { CATS } from '@/data/perfumes';
 import { arN, arDec, norm } from '@/lib/arabic';
@@ -30,7 +30,9 @@ const BRANDS = Object.keys(BRAND_AR).sort((a, b) => a.localeCompare(b));
 
 const NOTE_OPTIONS = NOTES_DB.filter((nt) =>
   PERFUMES.some((d) => d.notes.some((x) => x.indexOf(nt.n) > -1))
-).map((nt) => nt.n);
+)
+  .sort((a, b) => (b.count ?? 0) - (a.count ?? 0))
+  .map((nt) => nt.n);
 
 const SORTS: { v: SortMode; l: string }[] = [
   { v: 'rank', l: 'الترتيب الافتراضي' },
@@ -41,7 +43,6 @@ const SORTS: { v: SortMode; l: string }[] = [
   { v: 'name', l: 'أبجدياً (أ‑ي)' },
 ];
 
-const TOP_RATED = PERFUMES.reduce((a, b) => (b.rate > a.rate ? b : a));
 const LONGEST = PERFUMES.reduce((a, b) => (b.pf > a.pf ? b : a));
 const TOP_SILLAGE = PERFUMES.reduce((a, b) => (b.ps > a.ps ? b : a));
 const ALT_COUNT = new Set(PERFUMES.map((d) => d.an)).size;
@@ -82,10 +83,12 @@ function Chip({
   active,
   onClick,
   children,
+  cc,
 }: {
   active: boolean;
   onClick: () => void;
   children: ReactNode;
+  cc?: string;
 }) {
   return (
     <button
@@ -94,6 +97,7 @@ function Chip({
       className={
         'fchip' + (active ? ' on' : '')
       }
+      style={cc ? ({ '--cc': cc } as React.CSSProperties) : undefined}
     >
       {children}
     </button>
@@ -135,7 +139,7 @@ function PerfumeCard({
           {isFav ? '♥' : '♡'}
         </button>
         <span className="altbadge" title={'البديل: ' + p.an + ' — ' + p.abr}>
-          <BottleMini idx={idx} c1={cat?.c ?? '#888'} c2={cat?.c2 ?? '#555'} code={code} variant={v} />
+          <BottleMini />
           <span className="abx">
             <b>البديل</b>
             <small>{p.abr}</small>
@@ -148,10 +152,10 @@ function PerfumeCard({
         <div className="who">
           <h3>
             {p.n}
-            <small>{p.en}</small>
+            <small lang="en" dir="ltr">{p.en}</small>
           </h3>
           <p className="pbrand">
-            {p.br} · {p.bar}
+            <span lang="en" dir="ltr">{p.br}</span> · {p.bar}
             <span className="price">{p.price}</span>
             <span className="rate">★ {arDec(p.rate)}</span>
           </p>
@@ -189,7 +193,7 @@ function PerfumeCard({
             <span className="altpill">البديل المقترح</span>
             <b>{p.an}</b>
             <small>
-              {p.abr} · {p.abar}
+              <span lang="en" dir="ltr">{p.abr}</span> · {p.abar}
             </small>
             <span
               className={'sim ' + tier.c}
@@ -222,6 +226,21 @@ export default function Home() {
   const [notesOpen, setNotesOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const glossary = useMemo(() => glossaryGroups(), []);
+  const noteCloseRef = useRef<HTMLButtonElement>(null);
+  const noteBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Focus management + scroll lock for the notes modal
+  useEffect(() => {
+    if (!notesOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    const trigger = noteBtnRef.current;
+    document.body.style.overflow = 'hidden';
+    noteCloseRef.current?.focus();
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      trigger?.focus();
+    };
+  }, [notesOpen]);
 
   const activeFilterCount =
     (state.blindOnly ? 1 : 0) +
@@ -241,12 +260,34 @@ export default function Home() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  // Deep link from quiz results: scroll to #p-N card
+  // Deep link from quiz results: scroll to #p-N card with a flash highlight
   useEffect(() => {
     if (window.location.hash.startsWith('#p-')) {
       const el = document.getElementById(window.location.hash.slice(1));
-      if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+      if (el) {
+        const reduce = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+        el.classList.add('flash');
+        setTimeout(
+          () =>
+            el.scrollIntoView({
+              behavior: reduce ? 'auto' : 'smooth',
+              block: 'center',
+            }),
+          300
+        );
+        setTimeout(() => el.classList.remove('flash'), 1800);
+      }
     }
+  }, []);
+
+  // Back-to-top button visibility
+  const [showTop, setShowTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const visible = useMemo(() => {
@@ -298,6 +339,9 @@ export default function Home() {
 
   return (
     <>
+      <a href="#main" className="skip-link">
+        تخطَّ إلى المحتوى
+      </a>
       <header className="top">
         <span className="logo">عَطْـر</span>
         <span className="tag">بديل عطر ٢ · النسخة الرجالية</span>
@@ -332,7 +376,7 @@ export default function Home() {
           </div>
           <div className="records">
             <span className="rec">
-              🏆 ملك الثبات: <b>{TOP_RATED.n} {arN(TOP_RATED.pf)}٪</b>
+              🏆 ملك الثبات: <b>{LONGEST.n} {arN(LONGEST.pf)}٪</b>
             </span>
             <span className="rec">
               💨 أقوى فوحان: <b>{TOP_SILLAGE.n} {arN(TOP_SILLAGE.ps)}٪</b>
@@ -381,6 +425,7 @@ export default function Home() {
               value={state.term}
               onChange={(e) => update('term', e.target.value)}
               placeholder="ابحث عن عطر، بديل، نوتة… مثال: عود، فانيليا، لطافة"
+              aria-label="ابحث في العطور"
             />
             <button
               className="qclear"
@@ -474,6 +519,7 @@ export default function Home() {
             <button
               className="notebtn"
               id="notebtn"
+              ref={noteBtnRef}
               type="button"
               onClick={() => setNotesOpen(true)}
             >
@@ -505,7 +551,7 @@ export default function Home() {
               ♥ المفضلة {count > 0 && `(${arN(count)})`}
             </Chip>
             {CAT_KEYS.map((k) => (
-              <Chip key={k} active={state.curCat === k} onClick={() => update('curCat', k)}>
+              <Chip key={k} active={state.curCat === k} cc={CATS[k].c} onClick={() => update('curCat', k)}>
                 <i style={{ background: CATS[k].c }} />
                 {CATS[k].n}
               </Chip>
@@ -518,7 +564,7 @@ export default function Home() {
               </Chip>
             ))}
           </div>
-          <span className="count">
+          <span className="count" role="status" aria-live="polite" aria-atomic="true">
             يعرض {arN(visible.length)} من {arN(TOTAL)} عطر
           </span>
         </div>
@@ -590,6 +636,23 @@ export default function Home() {
         </div>
       </footer>
 
+      <button
+        className={'toTop' + (showTop ? ' show' : '')}
+        type="button"
+        aria-label="إلى الأعلى"
+        onClick={() =>
+          window.scrollTo({
+            top: 0,
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)')
+              .matches
+              ? 'auto'
+              : 'smooth',
+          })
+        }
+      >
+        ↑
+      </button>
+
       {notesOpen && (
         <div className="notemodal open" role="dialog" aria-modal="true" aria-label="موسوعة النوتات" onClick={(e) => {
           if (e.target === e.currentTarget) setNotesOpen(false);
@@ -597,7 +660,13 @@ export default function Home() {
           <div className="notemodal-inner">
             <div className="notemodal-head">
               <h3>موسوعة النوتات العطرية</h3>
-              <button className="noteclose" type="button" onClick={() => setNotesOpen(false)}>
+              <button
+                ref={noteCloseRef}
+                className="noteclose"
+                type="button"
+                aria-label="إغلاق الموسوعة"
+                onClick={() => setNotesOpen(false)}
+              >
                 ✕
               </button>
             </div>
@@ -607,8 +676,9 @@ export default function Home() {
                   <div className="notecat-title">{group.cat}</div>
                   <div className="notegrid">
                     {group.items.map((nt) => (
-                      <div
+                      <button
                         key={nt.n}
+                        type="button"
                         className="note-card"
                         onClick={() => {
                           update('curNote', nt.n);
@@ -621,7 +691,7 @@ export default function Home() {
                           <span className="note-card-count">{arN(nt.count ?? 0)} عطراً</span>
                         </div>
                         <div className="note-card-desc">{nt.d}</div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>

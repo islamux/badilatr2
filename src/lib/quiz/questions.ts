@@ -12,12 +12,6 @@ export interface QuizQuestion {
   max?: number;
 }
 
-export const QICON: Record<string, string> = {
-  woody: '🪵', oriental: '🔥', citrus: '🍋', aromatic: '🌿',
-  aquatic: '🌊', leather: '👞', spicy: '🌶️', floral: '🌸',
-  gourmand: '🍰', fougere: '💈', boozy: '🍷',
-};
-
 export const questions: QuizQuestion[] = [
   {
     title: 'متى وأين ستلبس عطرك أكثر؟',
