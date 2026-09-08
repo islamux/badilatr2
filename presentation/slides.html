@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بديل عطر ٢ — عرض تقني | ٦٠ دقيقة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14100a;
+    --panel:#1f1810;
+    --panel2:#241c12;
+    --ink:#f3e6cf;
+    --mut:#b9a488;
+    --gold:#d4a24e;
+    --teal:#7fb8a6;
+    --line:rgba(212,162,78,.18);
+    --disp:'Aref Ruqaa','Tajawal',serif;
+    --body:'Tajawal','Segoe UI',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.7;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ====== platform niceties ====== */
+  a.link{color:var(--teal);text-decoration:none;border-bottom:1px dashed rgba(127,184,166,.5)}
+  a.link:hover{color:var(--gold)}
+  code{
+    font-family:var(--mono);
+    font-size:.85em;
+    background:rgba(212,162,78,.09);
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:.05em .35em;
+    color:#e8c877;
+  }
+  pre{
+    direction:ltr;
+    text-align:left;
+    font-family:var(--mono);
+    font-size:.82em;
+    line-height:1.55;
+    background:#0d0a06;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:.9em 1.1em;
+    overflow:auto;
+    white-space:pre;
+    color:#d7c9a8;
+  }
+  pre .k{color:#d4a24e}pre .s{color:#9fd0c0}pre .c{color:#7d6f58}pre .f{color:#e0bd6b}
+  .badge{
+    display:inline-block;background:rgba(212,162,78,.12);border:1px solid var(--line);
+    color:var(--gold);border-radius:99px;padding:.1em .8em;font-size:.78em;font-weight:500;white-space:nowrap;
+  }
+  .badge.warn{background:rgba(200,90,60,.13);border-color:rgba(200,90,60,.4);color:#e89a7a}
+  .badge.ok{background:rgba(127,184,166,.12);border-color:rgba(127,184,166,.4);color:#9fd0c0}
+  .huge{font-size:clamp(3rem,8vw,6.2rem);font-family:var(--disp);line-height:1.1}
+
+  .muted{color:var(--mut)}
+  .gold{color:var(--gold)}
+  .teal{color:var(--teal)}
+  b,strong{color:#ffeecb;font-weight:700}
+
+  .snippet-tag{
+    display:inline-block;font-size:.72em;font-family:var(--mono);
+    background:#332a1c;color:#d8b36a;border:1px solid var(--line);
+    border-radius:6px;padding:.1em .55em;margin-inline-end:.5em;
+  }
+
+  /* ====== deck chrome ====== */
+  #progress{
+    position:fixed;top:0;inset-inline-start:0;height:3px;width:0%;
+    background:linear-gradient(to left,var(--gold),var(--teal));
+    z-index:60;transition:width .2s ease;
+  }
+  .controls{
+    position:fixed;bottom:0;inset-inline:0;height:52px;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 18px;gap:12px;
+    background:linear-gradient(to top,rgba(20,16,10,.98),rgba(20,16,10,.6));
+    border-top:1px solid var(--line);
+    backdrop-filter:blur(6px);
+  }
+  .controls .btn{
+    background:transparent;border:1px solid var(--line);color:var(--ink);
+    font-family:var(--body);font-size:.85em;font-weight:500;
+    border-radius:8px;padding:.42em .9em;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.5em;line-height:1;
+  }
+  .controls .btn:hover{border-color:var(--gold);color:var(--gold)}
+  .controls .btn[aria-disabled="true"]{opacity:.35;pointer-events:none}
+  .controls .group{display:flex;align-items:center;gap:8px}
+  .counter{font-family:var(--mono);font-size:.82em;color:var(--mut);direction:ltr}
+  .kbd{border:1px solid rgba(243,230,207,.3);border-bottom-width:2px;border-radius:4px;padding:0 .35em;font-family:var(--mono);font-size:.72em;color:var(--mut)}
+  #sectag{color:var(--gold);font-size:.78em;font-weight:500}
+
+  /* ====== slides ====== */
+  .slide{
+    position:absolute;inset:0 0 52px 0;
+    display:flex;align-items:center;justify-content:center;
+    padding:3.2vmin 4.5vmin clamp(2rem,5vmin,4rem);
+    opacity:0;visibility:hidden;transform:translateX(-2.2%);
+    transition:opacity .35s ease,transform .35s ease,visibility .35s;
+    overflow:hidden auto;
+  }
+  html[dir="rtl"] .slide{transform:translateX(-2.2%)}
+  .slide.on{opacity:1;visibility:visible;transform:none}
+
+  .rail{
+    position:fixed;inset-inline-start:0;top:0;bottom:52px;width:6px;z-index:5;
+    background:linear-gradient(to bottom,
+      #c78d3d,#d4a24e 35%,#6d9f8d 70%,#5c6420);
+    opacity:.55;
+  }
+  .rail::after{content:"";position:absolute;inset:0;background:transparent}
+
+  .inner{max-width:1180px;width:100%}
+  header{margin-bottom:2.6vmin}
+  .kicker{font-size:.8rem;letter-spacing:.04em;color:var(--gold);font-weight:500;
+    display:flex;align-items:center;gap:.7em;margin-bottom:.6em}
+  .kicker::before{content:"";width:2.2em;height:1px;background:linear-gradient(to left,var(--gold),transparent)}
+  h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.7rem,3.6vw,2.7rem);line-height:1.25;color:#ffeecb}
+  h3{font-family:var(--disp);font-size:clamp(1.15rem,2.2vw,1.55rem);color:var(--gold);margin-bottom:.5em;line-height:1.4}
+  .sub{color:var(--mut);font-size:clamp(.9rem,1.6vw,1.05rem);margin-top:.4em;max-width:64ch}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:2.2rem}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
+  @media (max-width:860px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+  .panel{
+    background:linear-gradient(160deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;
+  }
+  .panel.hl{border-color:rgba(212,162,78,.55);box-shadow:0 0 0 1px rgba(212,162,78,.15),0 8px 30px rgba(0,0,0,.35)}
+  .panel h4{font-family:var(--disp);font-size:1.05rem;color:var(--gold);margin-bottom:.5em}
+
+  ul.tick{list-style:none}
+  ul.tick li{position:relative;padding-inline-start:1.5em;margin:.45em 0;color:#e6d6b4}
+  ul.tick li::before{content:"";position:absolute;inset-inline-start:.1em;top:.75em;width:.65em;height:.65em;
+    background:var(--gold);transform:rotate(45deg);opacity:.8}
+  ul.tick li b{color:#ffeecb}
+
+  .num{font-family:var(--mono);direction:ltr;text-align:left}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:.4em}
+  @media (max-width:760px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1rem;text-align:center}
+  .stat b{font-size:clamp(1.5rem,3vw,2.1rem);font-family:var(--mono);direction:ltr;display:block;color:var(--gold)}
+  .stat span{font-size:.82rem;color:var(--mut)}
+
+  /* flow diagram */
+  .flow{display:flex;align-items:stretch;gap:.55rem;flex-wrap:wrap;direction:rtl}
+  .flow .node{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:.5rem .8rem;font-size:.82em;text-align:center;min-width:74px;flex:1;
+  }
+  .flow .node b{display:block;font-size:.95em;color:#ffeecb}
+  .flow .node small{color:var(--mut);font-family:var(--mono);font-size:.7em;direction:ltr;display:inline-block}
+  .flow .node.hot{border-color:var(--gold);background:rgba(212,162,78,.1)}
+  .flow .node.cool{border-color:var(--teal);background:rgba(127,184,166,.08)}
+  .flow .sep{align-self:center;color:var(--gold);font-size:1.2em;padding:0 .1em}
+  .flow.wrap-label{flex-direction:row}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:clamp(.78rem,1.4vw,.92rem)}
+  th{font-family:var(--disp);color:var(--gold);text-align:start;font-weight:700}
+  th,td{padding:.55em .8em;border-bottom:1px solid var(--line)}
+  tr:last-child td{border-bottom:none}
+  tfoot td{border-top:2px solid var(--gold);border-bottom:none;font-weight:700;color:#ffeecb}
+  td.n{font-family:var(--mono);direction:ltr;text-align:left;color:#e8c877}
+  td small{color:var(--mut);font-family:var(--mono);direction:ltr;font-size:.78em;display:inline-block}
+
+  /* quiz mini card */
+  .qrow{display:flex;align-items:center;gap:1rem;padding:.8em 1em;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:.5em 0}
+  .qrow .rank{flex:0 0 2rem;height:2rem;border-radius:50%;background:rgba(212,162,78,.15);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--mono)}
+  .qrow .sc{font-family:var(--mono);color:var(--gold);background:rgba(212,162,78,.1);border-radius:8px;padding:.2em .6em;font-weight:600}
+  .qrow small{color:var(--mut);font-size:.8em}
+
+  .compare{display:grid;grid-template-columns:1.2fr 1fr;gap:1.2rem}
+  @media(max-width:780px){.compare{grid-template-columns:1fr}}
+  .vs{display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:var(--disp);font-size:1.4rem}
+
+  .quote{font-family:var(--disp);font-size:clamp(1.3rem,2.8vw,1.95rem);line-height:1.6;color:#ffeecb}
+  .quote .x{color:var(--gold)}
+
+  .tags{display:flex;flex-wrap:wrap;gap:.45em;margin:.5em 0}
+  .tags span{background:rgba(212,162,78,.09);border:1px solid var(--line);border-radius:99px;padding:.12em .75em;font-size:.8em;color:#e6d6b4}
+
+  /* family color rail ticks */
+  .tickdots{display:flex;flex-direction:column;gap:7px;position:absolute;inset-inline-start:14px;top:50%;transform:translateY(-50%);z-index:6}
+  .tickdots i{width:9px;height:9px;border-radius:50%;display:block;box-shadow:0 0 0 3px rgba(0,0,0,.4)}
+
+  /* notes */
+  aside.notes{display:none;position:fixed;inset-inline:0;bottom:56px;z-index:45;
+    background:#0d0a06;border-top:1px solid var(--gold);padding:14px 22px;max-height:38vh;overflow:auto}
+  aside.notes.open{display:block}
+  aside.notes p{color:#cfc2a6;font-size:.85rem}
+  aside.notes b{color:var(--gold)}
+
+  /* index overlay */
+  #overlay{position:fixed;inset:0;background:rgba(10,8,5,.96);z-index:80;display:none;overflow:auto;padding:3rem 6vmin}
+  #overlay.open{display:block}
+  #overlay .close{position:sticky;top:0;float:inline-end;background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:.4em .9em;cursor:pointer;font-family:var(--body)}
+  #overlay h3{font-family:var(--disp);color:var(--gold);margin-bottom:1.4rem}
+  #index-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.7rem}
+  #index-grid button{font-family:var(--body);font-size:.9rem;text-align:start;background:var(--panel);border:1px solid var(--line);color:#e6d6b4;border-radius:10px;padding:.7em .9em;cursor:pointer;display:flex;gap:.7em;align-items:baseline}
+  #index-grid button:hover{border-color:var(--gold);color:var(--gold)}
+  #index-grid b{font-family:var(--mono);color:var(--teal);font-size:.75em;direction:ltr}
+
+  /* currency-flow demo bar */
+  .bars{display:flex;align-items:flex-end;gap:8px;height:150px;direction:ltr}
+  .bars i{flex:1;background:linear-gradient(to top,var(--gold),#e8c877);border-radius:5px 5px 0 0;position:relative;min-height:3px}
+  .bars span{position:absolute;top:-1.5em;inset-inline:0;text-align:center;font-family:var(--mono);font-size:.7em;color:#ffeecb}
+  .bars .lbl{display:block;text-align:center;font-size:.72em;color:var(--mut);margin-top:.4em}
+
+  /* divider */
+  .slide.demo{background:
+    radial-gradient(1200px 600px at 85% -10%,rgba(212,162,78,.14),transparent 60%),
+    radial-gradient(900px 500px at 10% 110%,rgba(127,184,166,.12),transparent 60%),
+    var(--bg);text-align:center}
+  .slide.demo .big{font-family:var(--disp);font-size:clamp(2.4rem,6vw,4.6rem);font-weight:700;color:#ffeecb;line-height:1.3}
+  .slide.demo .big .x{color:var(--gold)}
+  .bottle-svg{width:80px;height:110px;margin:0 auto 1.2rem;opacity:.9}
+
+  @media print{
+    body{overflow:visible}
+    .controls,#progress,.rail,.tickdots{display:none!important}
+    .slide{position:static;opacity:1;visibility:visible;transform:none;height:auto;min-height:100vh;page-break-after:always;padding:3cm 2.5cm}
+    aside.notes{display:none!important}
+    code,pre{background:#f5f0e6;color:#222;border-color:#ccc}
+    a{color:#7a4a14}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    #progress{transition:none}
+    .slide{transition:none}
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div class="rail" aria-hidden="true"></div>
+<div class="tickdots" aria-hidden="true">
+  <i style="background:#b08a4f"></i><i style="background:#b34358"></i><i style="background:#bdb439"></i>
+  <i style="background:#55a38b"></i><i style="background:#4d94c8"></i><i style="background:#9a5a2e"></i>
+  <i style="background:#c44536"></i><i style="background:#c77288"></i><i style="background:#d99a3f"></i>
+  <i style="background:#8d86b8"></i><i style="background:#cd7f32"></i>
+</div>
+
+<!-- ═══════════════ S1 — العنوان ═══════════════ -->
+<section class="slide on" data-sec="opening" aria-label="العنوان">
+  <div class="inner" style="text-align:center">
+    <div class="bottle-svg" aria-hidden="true">
+      <svg viewBox="0 -34 120 200" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#e8c877"/><stop offset=".5" stop-color="#a97f33"/><stop offset="1" stop-color="#e0bd6b"/>
+        </linearGradient></defs>
+        <rect x="37" y="32" width="46" height="106" rx="12" fill="url(#g1)" opacity=".16" stroke="rgba(212,162,78,.5)"/>
+        <rect x="51" y="8" width="18" height="26" rx="5" fill="url(#g1)"/>
+        <rect x="55" y="30" width="10" height="30" fill="#3a2a18"/>
+        <rect x="45" y="104" width="30" height="22" rx="4" fill="#f2e4c4" opacity=".92"/>
+        <text x="60" y="119" text-anchor="middle" font-size="8" font-weight="700" fill="#4a3418" font-family="Tajawal,sans-serif">عطر</text>
+      </svg>
+    </div>
+    <p class="kicker" style="justify-content:center">عرض تقني أمام فريق فرونت-إند خبير · ٦٠ دقيقة</p>
+    <h1 class="huge">بديل عطر <span class="x">٢</span></h1>
+    <p class="sub" style="margin:1.1em auto;max-width:56ch">أطلس العطور الرجالية وبدائلها: ٥٦٩ عطراً مُقيَّماً، لكلٍّ منها بديل مدروس، في كتلة واحدة من الكود تُصدَّر سكونياً</p>
+    <div class="tags" style="justify-content:center;margin-top:1.4em">
+      <span>Next.js 16</span><span>React 19</span><span>TypeScript 6</span><span>Tailwind CSS 4</span>
+      <span>SSG بالكامل</span><span>RTL</span><span>بدون خادم</span><span>بدون API</span><span>بدون قاعدة بيانات</span>
+    </div>
+    <p class="muted" style="margin-top:1.6em;font-size:.85em">هل تفهم الكود مَن كتبه؟ ← تُثبِت هذه الشرائح ذلك: تدفق البيانات، وقرارات كل تقنية، وحدودها، وكيف تُختبر.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٩٠ ثانية.</b> افتتح بسؤال: «ما الذي يجعل المشروع صعباً لمن يرثه؟». الإجابة: ٥٦٩ سجلاً، وقواعد توافق صارمة مع نسخة قديمة، وحالة مخزّنة في الرابط والمتصفح.</p>
+    <p>الجمهور خبير فرونت-إند: جرّب الكلمات نفسها التي سيستخدمونها — SSG، Hydration، URL state.</p>
+    <p>لا تَقرأ الشريحة حرفياً. تشير إليها، وقل الجملة البيضاء بصياغتك.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S2 — خريطة الوقت ═══════════════ -->
+<section class="slide" data-sec="opening" aria-label="خريطة الوقت">
+  <div class="inner">
+    <header>
+      <span class="kicker">الافتتاح</span>
+      <h2>خريطة ٦٠ دقيقة</h2>
+      <p class="sub">قيمة كبيرة يمكن التحقق منها، لا عرض تسويقي. لكل قسم وعاء زمني — أي شريحة تتجاوز وعاءها إشارة لتقليص المحتوى، لا لتسريع الكلام.</p>
+    </header>
+    <table>
+      <thead><tr><th>القسم</th><th>ماذا يُثبَت</th><th class="n">الدقائق</th></tr></thead>
+      <tbody>
+        <tr><td>الافتتاح</td><td>ما المنتج، وما المشكلة؟</td><td class="n">5</td></tr>
+        <tr><td>الأطروحة</td><td>الفكرة الهندسية الحاكمة</td><td class="n">4</td></tr>
+        <tr><td>رحلة القرارات</td><td>مَنْ perfumes.html إلى بنية Next.js — ولماذا</td><td class="n">6</td></tr>
+        <tr><td>النموذج الذهني</td><td>مخطط تدفّق البيانات</td><td class="n">4</td></tr>
+        <tr><td>تجربة المنتج</td><td>ماذا يرى المستخدم؟</td><td class="n">5</td></tr>
+        <tr><td>الغوص التقني</td><td>توجيه/عرض/حالة/بيانات/أداء/أمان/اختبار + Hydration</td><td class="n">14</td></tr>
+        <tr><td>العرض الحيّ</td><td>النص الكامل في demo-script.md</td><td class="n">11</td></tr>
+        <tr><td>المقايضات</td><td>ماذا ربحنا وماذا دفعنا؟</td><td class="n">4</td></tr>
+        <tr><td>خارطة الطريق</td><td>أولويات مبنية على المخاطر لا الأمنيات</td><td class="n">3</td></tr>
+        <tr><td>الخاتمة + الأسئلة</td><td>جملة واحدة ثم أسئلة مفتوحة</td><td class="n">4</td></tr>
+      </tbody>
+      <tfoot><tr><td colspan="2">المجموع</td><td class="n">60</td></tr></tfoot>
+    </table>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> هذه الشريحة عقدُ الثقة: أعدها للجمهور قبل البداية. وضّح أن العرض قائم على <i>الأدلة من المصدر</i> — سيُفتح الكود عند أي سؤال.</p>
+    <p>إذا غاص العرض الحيّ أكثر من وعائه (١١ دقيقة) فسنضغطه إلى ٥: المسار الحرج فقط، والباقي بالإشارة إلى سكربت الحذف في demo-script.md.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S3 — المشكلة ═══════════════ -->
+<section class="slide" data-sec="opening" aria-label="المشكلة">
+  <div class="inner">
+    <header>
+      <span class="kicker">الافتتاح · المشكلة</span>
+      <h2>المعرفة العطرية العربية مشتّتة… ومكلفة</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>الثغرة</h4>
+        <ul class="tick">
+          <li>المُنتَج الأصلي غالباً <b>فاخر السعر</b> (كرييد، توم فورد، سيرجوف) — الثمن لا يبرّر رائحةً مجهولة.</li>
+          <li>أخبار «البديل» موزّعة: فيديوهات، منتديات، مقارنات متناقضة.</li>
+          <li>لا يوجد مصدر واحد يجيب: <b>مَن الأصلي؟ ما البديل الموثوق؟ إلى أي درجة يتشابه؟</b></li>
+          <li>المشتري يكتشف الحقيقة بعد الشراء — وهذا ثمن غالٍ.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>لماذا لم تحلّها أي أداة متاحة؟</h4>
+        <ul class="tick">
+          <li>قوائم أفضل-العطور تروّج للمنتج ولا توثّق بديلاً.</li>
+          <li>المحتوى العربي العطري نصّي غير مهيكل (نصوص منتديات).</li>
+          <li>البدائل أسماء عربية العامية (وودي عود، أسد، فنتانا) — يصعب البحث عنها بدون تطبيع حروف.</li>
+          <li>البيانات يدوية بامتياز: خبرة مجتمع، لا API جاهز.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:1.2em">سؤال القرار: كيف ننظّم ٥٦٩ زوجاً (أصلي ← بديل) في منتج يُصان ويُتحقق منه، بلا خادم ولا قاعدة بيانات؟</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠–٧٥ ثانية.</b> نقطة الألم حقيقية: سعر بديل «وودي عود» لـ«عود وود» توم فورد يختلف بفارق أرقام. المشكلة ليست تقنية — بل تنظيمة (بيانات) وتواصلية (عربية).</p>
+    <p>لاحظ: لا يوجد API حكومي ولا مصدر إحصائي للبدائل؛ البيانات <b>محرَّرة يدوياً</b> من تجارب مجتمعية ثم تُرقَّم بثوابت. هذا سيأتي في «عقد الأوراكل» لاحقاً.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S4 — المنتج بالأرقام ═══════════════ -->
+<section class="slide" data-sec="opening" aria-label="المنتج بالأرقام">
+  <div class="inner">
+    <header>
+      <span class="kicker">الافتتاح · المنتج</span>
+      <h2>منتج واحد، مصنوع من بيانات مُرقَّمة</h2>
+    </header>
+    <div class="stat-grid">
+      <div class="stat"><b>569</b><span>عطراً مُقيَّماً</span></div>
+      <div class="stat"><b>11</b><span>عائلة عطرية</span></div>
+      <div class="stat"><b>63</b><span>بديلاً مدروساً</span></div>
+      <div class="stat"><b>1138</b><span>قراءة ثبات وفوحان</span></div>
+      <div class="stat"><b>107</b><span>داراً للعطور الأصلية</span></div>
+      <div class="stat"><b>49</b><span>نوتة في موسوعة</span></div>
+      <div class="stat"><b>6</b><span>معايير ترتيب</span></div>
+      <div class="stat"><b>6</b><span>أسئلة اختبار البصمة</span></div>
+    </div>
+    <p class="sub" style="margin-top:1.1em">كل رقم هنا <b>مُستخرَج من المصدر</b> وقت التحضير (أمر node فوق src/data/perfumes.ts) — لا رقم تقديري. مثال: من عدد السجلات بعد تطبيق عائلة الـ bopzy.</p>
+    <div class="tags" style="margin-top:.5em"><span>٢ مساران فقط: <code class="num">/</code> و <code class="num">/quiz/</code></span><span>بدون API</span><span>بدون DB</span><span>بدون مصادقة</span></div>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٧٥ ثانية.</b> اذكر بصراحة كيفية الرقم: «٥٦٩» من <code>src/data/perfumes.ts:26</code> (بداية <code>rawPerfumes</code>). «١١» عائلة من <code>CATS</code>. «٦٣» بديلاً = <code>new Set(altNames).size</code> في <code>page.tsx:48</code>.</p>
+    <p>رقم «١١٣٨» = ٥٦٩ × ٢ (ثبات وفوحان لكلٍّ من الأصلي والبديل). هذه الإحصاءات المضمّنة في الترويسة نفسها (page.tsx:365-369).</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S5 — تشريح البطاقة ═══════════════ -->
+<section class="slide" data-sec="opening" aria-label="تشريح البطاقة">
+  <div class="inner">
+    <header>
+      <span class="kicker">الافتتاح · تجربة سريعة</span>
+      <h2>تشريح بطاقة واحدة: أصلي يقابل بديلاً</h2>
+    </header>
+    <div class="compare">
+      <div class="panel hl">
+        <h4>الأصلي</h4>
+        <p><b>أفينتوس</b> <small class="num">Creed · Aventus</small></p>
+        <div class="tags"><span>أناناس</span><span>كشمش أسود</span><span>خشب البتولا</span><span>عنبر</span><span>مسك</span></div>
+        <p style="margin-top:.5em">الثبات <span class="gold">85%</span> · الفوحان <span class="gold">80%</span> · تقييم <span class="gold">4.8</span> · شريحة <span class="gold">$$$</span></p>
+        <p><span class="badge warn">⚠ جرِّبه أولاً</span> <small class="muted">(الأصلي غير آمن للشراء الأعمى — سعر وتوقعات)</small></p>
+      </div>
+      <div class="panel">
+        <h4>البديل المقترح</h4>
+        <p><b>كلوب دو نوي إنتنس مان</b> <small class="num">Armaf · CDNIM</small></p>
+        <div class="tags"><span>ليمون</span><span>كشمش أسود</span><span>بتولا</span><span>فانيليا</span><span>مسك</span></div>
+        <p style="margin-top:.5em">الثبات <span class="teal">88%</span> · الفوحان <span class="teal">85%</span></p>
+        <p><span class="badge ok">✓ آمن للشراء الأعمى</span></p>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:1em">درجة التشابه: <b>🎯 توأم موثق 88%</b> — تُحسب من قاموس <code>SIM</code> بمفتاح اسم البديل المُطبَّع، مع تجاوز <code>OVR</code> لكل زوج.</p>
+    <p class="muted" style="font-size:.82em">المصدر: أفينتوس في <code>src/data/perfumes.ts:27</code> · الدرجة من <code>similarity.ts:141</code> (تجاوز OVR لأفينتوس ← كلوب دو نوي إنتنس مان = 88).</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٧٥ ثانية.</b> هذه أول لقطة منتج حقيقية — افتح لاحقاً في العرض الحيّ نفس البطاقة. لاحظ أن البديل قد يكون <b>أقوى</b> ثباتاً من الأصلي (فنتانا 88 مقابل أفنتوس الأصلي 85) — هذه مصداقية البيانات لا تسويق.</p>
+    <p>درجة «توأم موثق 88» ليست عشوائية: مفتاحها <code>كلوب دو نوي إنتنس مان</code> في SIM، ثم تجاوز OVR لمطابقة الزوج بدقة.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S6 — الأطروحة ═══════════════ -->
+<section class="slide" data-sec="thesis" aria-label="الأطروحة">
+  <div class="inner" style="text-align:center">
+    <span class="kicker" style="justify-content:center">الأطروحة</span>
+    <p class="quote" style="margin:1vh auto">البيانات <span class="x">مصفوفة</span> والواجهة <span class="x">دالة نقيّة</span>
+      منها: كل المنطق في مكتبات بلا DOM،
+      والحالة تُسرَّح في الرابط،
+      والمنتج كله أُنشئ ليتحوّل <span class="x">سكونياً</span>.</p>
+    <div class="grid3" style="margin-top:2.4em;text-align:start">
+      <div class="panel"><h4>منطق نقي</h4><p>فلترة/ترتيب/تشابه/اختبار في <code>src/lib/*</code> — قابل للاختبار بدون متصفح، وقابل لإعادة الاستخدام (الفهرس + الاختبار يستهلكان نفس <code>initCatalogData()</code>).</p></div>
+      <div class="panel"><h4>الرابط هو قاعدة الحالة</h4><p>لا خادم، لا قاعدة بيانات، لا مخزن عمومي: فلتر المستخدم يقبع في <code>#hash</code> ومفضّلته في <code>localStorage</code>.</p></div>
+      <div class="panel"><h4>السكون أولاً</h4><p><code>output:'export'</code> — كل شيء يُحضَّر في البناء. أي شيء لا يمكن أن يبقى سكونياً نستبعده صراحةً.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> الأطروحة هي «لماذا يعمل هذا المنتج بلا خادم»: لأن عبء العمل الرئيسي — مقارنة ٥٦٩ زوجاً — قرار تحريري يُحسم مرة واحدة في الكود، لا استعلام لكل مستخدم.</p>
+    <p>الفهرس والاختبار يستخدمان نفس <code>initCatalogData()</code> (src/lib/catalog/init.ts) — دليل وحدة الافتراض في الحياة الواقعية.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S7 — مبادئ الحوكمة ═══════════════ -->
+<section class="slide" data-sec="thesis" aria-label="المبادئ">
+  <div class="inner">
+    <header>
+      <span class="kicker">الأطروحة · عقود مشروع</span>
+      <h2>القواعد الذهبية غير القابلة للكسر</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>عقود التوافق (مع النسخة القديمة)</h4>
+        <ul class="tick">
+          <li><b>مفاتيح localStorage:</b> <code>p100favs</code> = مصفوفة فهارس البطاقات (<code>useFavorites.ts:4</code>) — الترتيب لا يتغيّر.</li>
+          <li><b>معاملات الرابط:</b> <code>cat</code>, <code>q</code>, <code>blind</code>, <code>sort</code>, <code>fav</code>, <code>brand</code>, <code>occ</code>, <code>note</code> (<code>state.ts:42-53</code>).</li>
+          <li><b>ترتيب السجلات ثابت:</b> إضافة سجل = في نهاية <code>rawPerfumes</code>.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>عقود التطوير</h4>
+        <ul class="tick">
+          <li><b>pnpm فقط.</b> لا npm/yarn.</li>
+          <li><b>لا SSR/API:</b> تصدير ثابت — المكوّنات التفاعلية تبدأ بـ <code>'use client'</code>.</li>
+          <li><b>RTL أولاً:</b> خصائص منطقية (<code>inset-inline-start</code>) لا <code>left/right</code>.</li>
+          <li><b>أرقام عربية-هندية</b> عبر <code>arN()</code>/<code>arDec()</code> للمستخدم.</li>
+          <li><b>UTF-8 إلزامي</b> وإلا تعطّل العربية.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:1em">المؤلف: <code>AGENTS.md</code> في الجذر. مصدر المفاتيح السابق <code>perfumes.html</code> هو <b>أوراكل مرجعي</b> — لا تطوير فيه إلا إصلاح موثّق.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> هذه أهم شريحة لفهم القيود: أي تعديل على منطق الفلترة/الترتيب/التشابه يجب أن يطابق <code>perfumes.html</code> — النسخة القديمة أحادية الملف هي «أوراكل» التوافق.</p>
+    <p>الثمن الذي سيرد لاحقاً: «الترتيب لا يتغيّر» = الفهارس مسألة حسابية، فإعادة ترتيب سجِلات تكسر مفضّلات مخزّنة. هذا تقييد صريح نقبله.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S8 — الأصل: perfumes.html ═══════════════ -->
+<section class="slide" data-sec="decisions" aria-label="الأصل">
+  <div class="inner">
+    <header>
+      <span class="kicker">رحلة القرارات · البداية</span>
+      <h2>الأصل: ملف HTML واحد من 2013 سطراً</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>بماذا خدم، وكيف عمل</h4>
+        <ul class="tick">
+          <li>تجربة كاملة ذاتية الاستضافة: CSS + JS + بيانات في ملف.</li>
+          <li>فتحه من القرص ← يعمل فوراً (بدون بناء).</li>
+          <li>أثبت الفرضية والفهرسة الخلفية للبيانات.</li>
+          <li>التوافق المرجعي: فهرسه (الترتيب)، بطاقاته، درجاته — <b>حقيقة النظام التي يجب أن يطابقها الخلف</b>.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>لماذا لا يقبل التطوير</h4>
+        <ul class="tick">
+          <li>بيانات ممزوجة بالعرض المضغوط (كائنات <code>D()</code> وسيطية بلا أنواع).</li>
+          <li>لا مكوّنات، لا إعادة استخدام، لا اختبار وحدة ممكن.</li>
+          <li>الفهرس والمفضّلة والرابط كلها منطق إلزامي في سطر واحد.</li>
+          <li>كثافة الملف = أخطاء تراجع صامتة (انظر سجل git: دفعات «audit» متكررة).</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:1em">القرار: <b>لا نهجّر الأوراكل يجمد، ولا نعيد بناءه من الصفر</b> — نُعيد كتابته بنيةً مع إبقائه <b>حقيقةَ مرجعٍ</b> للتوافق.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٧٥ ثانية.</b> 2013 سطراً — قياس فعلي بالـ <code>wc -l perfumes.html</code>. هذه ليست مبالغة.</p>
+    <p>الثابت الذهبي هنا: الحقول المحسوبة (مناسبات، تشابه) تُملأ تلقائياً لأدوات مثل <code>applyOccasions</code>/<code>assignScores</code> ولا تُكتب يدوياً — لذلك قارن نتائج الاختبار دائماً بالأدوات نفسها، لا بنصّ يدوي قد يتقادم.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S9 — لماذا Next.js ثابتاً ═══════════════ -->
+<section class="slide" data-sec="decisions" aria-label="قرار التقنية">
+  <div class="inner">
+    <header>
+      <span class="kicker">رحلة القرارات · القرار المحوري</span>
+      <h2>لماذا Next.js بتصدير سكوني؟ (ولماذا لم نأخذ بدائل)</h2>
+    </header>
+    <table>
+      <thead><tr><th>الخيار</th><th>ما كان يمنحه</th><th>لماذا لم يُعتمد</th></tr></thead>
+      <tbody>
+        <tr><td><b>ملف HTML الواحد</b> (وضع البداية)</td><td>صفر أدوات، يفتح محلياً</td><td>لا أنواع، لا مكوّنات، لا إعادة استخدام، توازن سيئ عند 569 بطاقة</td></tr>
+        <tr><td><b>SPA بخادم مرن</b> (CRA/Vite + API)</td><td>تقسيم كود، بيانات ديناميكية</td><td>ينفي فرضية «بلا خادم»؛ التصدير والسكون أولاً للمشروع، فقدنا السكون</td></tr>
+        <tr><td><b>SSR ديناميكي</b> (Node، فهرس محمي)</td><td>SEO ديناميكي، تجزئة</td><td>لا حاجة: المحتوى ثابت فإنه يحصل على نفس SEO؛ سلّمنا استضافة ثابتة وهوية الخادم الثابتة</td></tr>
+        <tr><td><b>Next.js 16 + output:'export'</b> ★</td><td>مكوّنات React من النوع، توجيه App Router، SSG، نظامان للأنماط، خطوط محلية</td><td>القرار: مكونات typesafe + التصدير السكوني يبقى، ويظل مفهوم <code>'use client'</code> صريحاً</td></tr>
+      </tbody>
+    </table>
+    <p class="sub" style="margin-top:1em">المصدر: ترتيب الافتراضات <code>next.config.ts:4-8</code>) <code>output:'export'</code>) التوجيه سكوني بالبناء بالتأكيد.)</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٧٥ ثانية.</b> القرار ليس «ما الأحدث» بل «ما الذي يتماشى مع الفرضية»: بدون أي استعلام للمستخدم، SSR ديناميكي مصارفة بلا أرباح. قرأنا التكلفة: <code>output:'export'</code> يحظر الميزات الديناميكية في البناء — وهذا تخصص يقبله الفريق الخبير.</p>
+    <p>ميزة جانبية حاسمة فيه: نفس قاعدة الكود تعمل الآن على <b>أي استضافة ثابتة</b> (Hostinger/Vercel/Netlify)، وليس فقط خادم Next.js مخصص.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S10 — عقد الأوراكل ═══════════════ -->
+<section class="slide" data-sec="decisions" aria-label="عقد الأوراكل">
+  <div class="inner">
+    <header>
+      <span class="kicker">رحلة القرارات · التوافق</span>
+      <h2>عقد الأوراكل: كيف نصون المساواة مع ملف 2013</h2>
+    </header>
+    <div class="grid3">
+      <div class="panel"><h4>مُخرجات يجب أن تتطابق</h4><ul class="tick">
+        <li>عدد السجلات ومحتوى الفهرسة.</li>
+        <li>نتائج بحث مطابقة (ع/ف/ل/ع/ك…).</li>
+        <li>ترتيب الأوضاع الستة.</li>
+        <li>درجات التشابه (الأزواج ٨٠٪+).</li>
+        <li>مسار الاختبار الخمسة.</li>
+      </ul></div>
+      <div class="panel"><h4>كيف يُنفَّذ</h4><ul class="tick">
+        <li><code>rawPerfumes</code> ثابت الترتيب؛ الحقول المحسوبة تُحقن.</li>
+        <li>تهيئة الصفحة بترتيب إلزامي: <code>applyBoozy</code> ← <code>applyOccasions</code> ← <code>assignScores</code></li>
+        <li>قائمة تحقق يدوية من <code>AGENTS.md</code> قبل كل تسليم.</li>
+      </ul></div>
+      <div class="panel"><h4>الخطأ الذي نتجنّبه</h4><ul class="tick">
+        <li>إعادة تسمية أصناف CSS القديمة (فهرس يستورد الشبكة حرفياً).</li>
+        <li>كتابة <code>occ</code>/<code>sim</code> يدوياً داخل السجلات.</li>
+        <li>افتراض التكافؤ بناءً على العنوان لا النتيجة.</li>
+      </ul></div>
+    </div>
+    <p class="sub" style="margin-top:1em">التهيئة الإلزامية للبيانات كما في المشروع (<code>init.ts:7-12</code>):</p>
+    <pre><span class="c">// initCatalogData(): تُستدعى مرة لكل وحدة صفحة</span>
+<span class="k">const</span> data = <span class="f">applyBoozy</span>(rawPerfumes);  <span class="c">// تعيد مصفوفة جديدة — لا تغيّر في المكان</span>
+<span class="f">applyOccasions</span>(data);   <span class="c">// تحقن d.occ من قاموس WARDROBE</span>
+<span class="f">assignScores</span>(data);     <span class="c">// تحقن d.sim من SIM + تجاوزات OVR</span></pre>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٧٥ ثانية.</b> الجزء المبرمج هنا صريح: طلب إلزامي، لا دمج؛ لأن <code>applyBoozy</code> تعيد مصفوفة بينما الباقيان يغيّران في المكان — لو أُعيد ترتيب الدمج لاختل الدليل.</p>
+    <p>سأعرض قرب النهاية «مسارات الاختبار الخمسة» — مجموعة محددة من الإجابات يجب أن تنتج نفس التوصيات في الإصدارين.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S11 — الخط الزمني ═══════════════ -->
+<section class="slide" data-sec="decisions" aria-label="الخط الزمني">
+  <div class="inner">
+    <header>
+      <span class="kicker">رحلة القرارات · التنفيذ</span>
+      <h2>من الملف الواحد إلى البنية — مسار git</h2>
+    </header>
+    <table>
+      <thead><tr><th>المرحلة</th><th>القرار</th><th>الشهادة في التاريخ</th></tr></thead>
+      <tbody>
+        <tr><td>1. الهيكلة</td><td>Next.js بنوع البيانات والمكتبات المجردة</td><td><small>5cfcf5b scaffold Next.js with typed domain data and catalog logic</small></td></tr>
+        <tr><td>2. تجربة الاختبار</td><td>صفحة مستقلة /quiz/ ثم ترابط Q2 بأسماء عائلات حقيقية</td><td><small>dac152f / 9e3c2be align scent quiz with real CATS taxonomy</small></td></tr>
+        <tr><td>3. التكافؤ البصري</td><td>نقل أصناف CSS القديمة حرفياً + قوارير SVG</td><td><small>e395dce visual parity with original — bottle stage, section headers</small></td></tr>
+        <tr><td>4. الخطوط محلياً</td><td>14 ملف woff2 في public/fonts لدعم السكون</td><td><small>301b37a add local font files to public/fonts for static export</small></td></tr>
+        <tr><td>5. مزايا المنتج</td><td>فلترة مناسبات، موسوعة نوتات، زر الاختبار في الترويسة</td><td><small>9f64d91 / eef0d85 / 0cd8c7a</small></td></tr>
+        <tr><td>6. إصلاح التكافؤ</td><td>عيوب P0 من خطة اختبار (بطاقات، حدَقة، arN، رابط الحالة، الجوال، الاختبار)</td><td><small>989bd5e P0 parity defects</small></td></tr>
+        <tr><td>7. تدقيق P0-P3</td><td>توافق أوراكل + وصولية + تشديد أمان + أدوات</td><td><small>PR #29 fix: audit P0-P3</small></td></tr>
+      </tbody>
+    </table>
+    <p class="sub" style="margin-top:1em">تاريخ مقسّم بادّعاءات قابلة للتحقق: كل التزام إمّا ميزة أو إصلاح توافق أو تدقيق — لا «refactor شكلي».</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> هذا ليس سرد تواريخ؛ إنه دليل نمط العمل: بنية أولاً، توافق ثانياً، تدقيق ثالثاً. التزام «audit P0-P3» أهم مثال: فريق كامل من الأنظار على الارتقاء بالأوراكل والوصولية والأمان في PR واحد (<code>1fca00a</code>).</p>
+    <p>أولئك الذين يشككون في «هل فهمت الكود» سيجدون التفصيل المفيد في سلسلة التدقيق.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S12 — استخلاص المنطق النقي ═══════════════ -->
+<section class="slide" data-sec="decisions" aria-label="المنطق النقي">
+  <div class="inner">
+    <header>
+      <span class="kicker">رحلة القرارات · العمارة</span>
+      <h2>كل المنطق في مكانٍ بلا DOM</h2>
+    </header>
+    <div class="grid4">
+      <div class="panel"><h4>filter</h4><p><code>buildHaystacks</code> يجهّز نص بحث مُطبَّع لكل سجل؛ <code>matches</code> يفحص ٧ شروط.</p><small class="num">src/lib/catalog/filter.ts</small></div>
+      <div class="panel"><h4>sort</h4><p>6 أوضاع فوق فهارس مرتّبة: rate/pf/ps/price/name/rank.</p><small class="num">src/lib/catalog/sort.ts</small></div>
+      <div class="panel"><h4>similarity</h4><p>قاموس SIM (60 مفتاحاً) + 119 تجاوز OVR ← <code>d.sim</code>.</p><small class="num">src/lib/catalog/similarity.ts</small></div>
+      <div class="panel"><h4>occasions</h4><p>قاموس WARDROBE (63 إدخالاً) ← وسوم 7 مناسبات.</p><small class="num">src/lib/catalog/occasions.ts</small></div>
+      <div class="panel"><h4>notes</h4><p>49 نوتة في 12 مجموعة، عدّ حي، فلترة موسوعية.</p><small class="num">src/lib/catalog/notes.ts</small></div>
+      <div class="panel"><h4>state</h4><p>تحليل/بناء رابط الحالة مع تحقق من القيم الصالحة.</p><small class="num">src/lib/catalog/state.ts</small></div>
+      <div class="panel"><h4>quiz/scoring</h4><p>تقييم 569 عطراً في 6 إجابات ثم أفضل 5.</p><small class="num">src/lib/quiz/scoring.ts</small></div>
+      <div class="panel"><h4>arabic</h4><p><code>arN</code>/<code>norm</code>/<code>priceRank</code> — تطبيع حروف بلا إطار.</p><small class="num">src/lib/arabic.ts</small></div>
+    </div>
+    <p class="sub" style="margin-top:1em">الفائدة الأولى: <b>قابلية الاختبار</b> (استيراد نقي في vitest بدون متصفح — موضوع «الاختبار» لاحقاً)، والفائدة الثانية: الفهرس <b>والاختبار</b> يستهلكان نفس <code>initCatalogData()</code> فلا يتقادم منطق.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> العمارة مرآة للبيانات: 8 مكتبات نقية — لا ملف واحد <code>D()</code> مضغوطاً. تقديم كل حقل بحسابه: SIM يحتوي 60 مفتاحاً (قابلة للعد، <code>similarity.ts:5-70</code>).</p>
+    <p>لمشاركة الجمهور: «نفس الدالة تصنع فهرس الصفحة ونتائج الاختبار» هي إجابة عن سؤال 'لماذا لا نجعل ذلك SPA'.
+
+  </aside>
+</section>
+
+<!-- ═══════════════ S13 — نظاما الأنماط ═══════════════ -->
+<section class="slide" data-sec="decisions" aria-label="نظاما الأنماط">
+  <div class="inner">
+    <header>
+      <span class="kicker">رحلة القرارات · الأنماط</span>
+      <h2>نظاما أنماط متعمدان — وكلاهما صحيح</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>الفهرس: أصناف القديم في globals.css</h4>
+        <ul class="tick">
+          <li>منقولة <b>حرفياً بأسمائها</b> من النسخة القديمة (<code>.card</code>, <code>.stage</code>, <code>.toolbar</code>, <code>.fpanel</code>…).</li>
+          <li>السبب: <b>التكافؤ البصري</b> مع الأوراكل — لا إعادة تسمية لا تكسر اللقطة.</li>
+          <li>شبكة مركّبة: 1657 سطراً في <code>src/app/globals.css</code>.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>الاختبار والمكونات الخفيفة: Tailwind</h4>
+        <ul class="tick">
+          <li>فلترة فورية، أنماط مركّبة في JSX، System CSS variables من المشروع.</li>
+          <li>خط <code>--gold</code>/<code>--teal</code> معرّفة في <code>:root</code> (<code>globals.css:143-151</code>) ويستهلكها كلا النظامين.</li>
+          <li><code>@import "tailwindcss"</code> في أعلى نفس الملف — لا صراع: مساحات مفصولة بالنطاق.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:1em">مرجع الأنماط المركّبة: <code>src/app/globals.css:143-151</code> (متغيرات اللون) و ما بعد <code>:root</code>؛ تفاعل <code>prefers-reduced-motion</code> في <code>globals.css:1640-1657</code>.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> قد يبدو تناقضاً — لكنه مقصود وموثق في AGENTS.md. هذا الفصل يجعل «هل تغيّر مظهر الفهرس؟» سؤالاً بسيطاً: <code>git diff globals.css</code>.</p>
+    <p>لاحظ المزاوجة: كلاهما يعمل على نفس مفاتيح الألوان — تيم التواصل الفردي عبر المتغيرات لا عبر أسماء أصناف.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S14 — مخطط تدفق البيانات ═══════════════ -->
+<section class="slide" data-sec="model" aria-label="تدفق البيانات">
+  <div class="inner">
+    <header>
+      <span class="kicker">النموذج الذهني</span>
+      <h2>دفق البيانات: من البيانات الخام إلى البطاقة</h2>
+    </header>
+    <p class="sub" style="margin-bottom:.8em">مسار <b>الجانب الثابت</b> (يُحضَّر مرة واحدة عند تحميل الوحدة) ثم مسار <b>تفاعلي</b> تقوده الحالة:</p>
+    <div class="panel" style="margin-bottom:1.2rem">
+      <div class="flow">
+        <div class="node hot"><b>rawPerfumes</b><small>569</small></div><span class="sep">→</span>
+        <div class="node"><b>applyBoozy</b><small>perfumes.ts:19</small></div><span class="sep">→</span>
+        <div class="node"><b>applyOccasions</b><small>occasions.ts:108</small></div><span class="sep">→</span>
+        <div class="node"><b>assignScores</b><small>similarity.ts:228</small></div><span class="sep">→</span>
+        <div class="node cool"><b>buildHaystacks</b><small>filter.ts:6</small></div>
+      </div>
+      <p class="muted" style="font-size:.8em;margin-top:.6em">كلها عند النطاق (<code>page.tsx:18-23</code>, <code>QuizClient.tsx:10</code>) — تُنفَّذ قبل أول render، وليس عند كل استدعاء.</p>
+    </div>
+    <div class="panel">
+      <div class="flow">
+        <div class="node hot"><b>#hash</b><small>state.ts</small></div><span class="sep">→</span>
+        <div class="node"><b>useCatalogState</b><small>hooks/useCatalogState.ts</small></div><span class="sep">→</span>
+        <div class="node cool"><b>matches</b><small>filter.ts:17</small></div><span class="sep">→</span>
+        <div class="node cool"><b>sortBy</b><small>sort.ts:5</small></div><span class="sep">→</span>
+        <div class="node"><b>sections</b><small>page.tsx:302</small></div><span class="sep">→</span>
+        <div class="node"><b>PerfumeCard</b><small>#p-N</small></div>
+      </div>
+      <p class="muted" style="font-size:.8em;margin-top:.6em">المفضّلة: <code>localStorage['p100favs']</code> ← <code>useFavorites</code> ← <code>favs: Set&lt;number&gt;</code> ← يُقرأ داخل <code>matches</code> لشرط <code>favOnly</code>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠–٧٥ ثانية.</b> المخطط الوحيد المهم: صفّان. الأول «بيانات ثابتة» تُحسم في البناء. الثاني «حالة» تُسرَّح في الرابط وتعاد قراءتها عند التحميل.</p>
+    <p>لاحظ أن الكلمات نفسها في المخطط مهارات الكود — اجعل ذلك حجر الزاوية عند السؤال عن «أين يبدأ الشيء».</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S15 — حدود الخادم/العميل ═══════════════ -->
+<section class="slide" data-sec="model" aria-label="حدود الخادم والعميل">
+  <div class="inner">
+    <header>
+      <span class="kicker">النموذج الذهني · العرض</span>
+      <h2>خادم ↔ عميل: ما أين يُحسب</h2>
+    </header>
+    <div class="compare">
+      <div class="panel">
+        <h4>زمن البناء (الخادم/Next build)</h4>
+        <ul class="tick">
+          <li>pre-render كامل HTML للصفحتين + <code>/_not-found</code>.</li>
+          <li><code>metadata</code> من <code>layout.tsx</code> و quiz/page.tsx تُغلّف في <code>&lt;head&gt;</code>.</li>
+          <li>نتاج ثابت يقبع في <code>out/</code> (3.8MB كاملاً) — جاهز لأي استضافة ثابتة.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>زمن التشغيل (المتصفح)</h4>
+        <ul class="tick">
+          <li>Rehydrate شجرة React الموجود ثم تتبّع التفاعلات.</li>
+          <li>قراءة <code>localStorage</code>/<code>hash</code> — خارج شجرة <code>useState</code> الأولية فحص ماهرك.</li>
+          <li>الفلترة/الترتيب <b>بالتزامن تام من طرف العميل</b> على الـ 569 سجلاً.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:1em">منزلي الحرج: <b>لا خادم في زمن التشغيل</b>. لا شيء ديناميكي، لا <code>cookies</code>، لا <code>fetch</code>. لذلك شروطان: من لا يستطيع التحقق سكونياً يُستبعد صراحة.</p>
+    <p class="muted" style="font-size:.82em">ملاحظة راهنة: <code>time&gt;suppressHydrationWarning&lt;/time&gt;</code> (page.tsx:348) — التاريخ يُحسب في زمن البناء ولديه زمن مختلف في العرض الأول للعميل؛ القفل في المعالجة.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> القاعدة: كل شيء قابل للسكر في HTML قبل JS. أظهروا ذلك لاحقاً في العرض الحي بإيقاف JS في DevTools.</p>
+    <p>الزاوية السلوكية الصادقة: المفضلّة والعرب هي حالة عميلية <b>فقط</b> — فلتنقل بالرابط جزء منها والبقية يتم ترجمتها. توازن مقصود بين القابلية للمشاركة والخصوصية.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S16 — جولة الواجهة ═══════════════ -->
+<section class="slide" data-sec="product" aria-label="جولة الواجهة">
+  <div class="inner">
+    <header>
+      <span class="kicker">تجربة المنتج</span>
+      <h2>الترويسة، الشريط، والأقسام — كلها حالة واحدة</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>ما يلمسه المستخدم</h4>
+        <ul class="tick">
+          <li>ترويسة بأرقام منشورة: 569/11/63/1138 + ملك الثبات <code>إنترلود مان 92%</code> وقمة الفوحان <code>BR540 90%</code>.</li>
+          <li>شريط: بحث، زر فلترة (عداد) ⚙، حبات كتل حية، شرائح عائلات ملوّنة، شرائح مناسبات.</li>
+          <li>حالة نشطة كـ chips قابلة للمسح (بحث:…، الشراء الأعمى فقط…).</li>
+          <li>عدّاد حي «يعرض X من 569» مزوّد بـ <code>aria-live</code>.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>كيف يتحقق</h4>
+        <ul class="tick">
+          <li><code>visible</code> = <code>useMemo</code> يمر عبر 569 ويفلتر بـ <code>matches</code> ثم <code>sortBy</code> (<code>page.tsx:293-300</code>).</li>
+          <li>الأقسام = تجميع الفهارس المرئية حسب <code>d.c</code> (<code>page.tsx:302-311</code>).</li>
+          <li>الحبات تُبنى من <code>CATS</code> بثبات (<code>CATS</code> مصدر أسماء العائلات كلها).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:.8em">
+      <span>Navigator: فلاتر مدمجة فقط فلا معلومات محفوظة للخادم</span>
+      <span>dry: لا خطوط خارجية معطية للصور — SVG فقط</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> هذا وبطاقة «S5» مدهشة للانتقال إلى العرض الحي لاحقاً. المرر قصير النطاق يساعد: <code>matches</code> ذو معرفة بالخيط الداخلي.</p>
+    <p>لا تقل «سرعة فورية» بدون قياس — قل: فلترة كتلة واحدة بذاكرة محلية على 569 عنصراً بلا طلبات.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S17 — البحث والتطبيع ═══════════════ -->
+<section class="slide" data-sec="product" aria-label="البحث">
+  <div class="inner">
+    <header>
+      <span class="kicker">تجربة المنتج · البحث</span>
+      <h2>«عود» <span class="teal">=</span> «عُود» <span class="teal">=</span> «عود» — تطبيع بلا تشكيل</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>مشكلة المستخدم</h4>
+        <ul class="tick">
+          <li>يكتب المستخدم بلا تشكيل أو بألف (ا/أ/آ/إ) أو بتاء مربوطة أو ألف مقصورة.</li>
+          <li>البيانات مكتوبة بنقاط محددة («عُود»، «عطر»…).</li>
+          <li>بدون تطبيع: بحث جزئي يفشل رغم التطابق اللغوي.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>الحل — <code>norm()</code></h4>
+        <pre><span class="k">export function</span> <span class="f">norm</span>(s: string): string {
+  <span class="k">return</span> s
+    .toLowerCase_()
+    <span class="c">// إزالة التشكيل والمدّة</span>
+    .replace(<span class="s">/[\u064B-\u0652\u0640]/g</span>, <span class="s">''</span>)
+    .replace(<span class="s">/[أإآٱ]/g</span>, <span class="s">'ا'</span>)   <span class="c">// توحيد الألف</span>
+    .replace(<span class="s">/ة/g</span>, <span class="s">'ه'</span>)        <span class="c">// تاء مربوطة</span>
+    .replace(<span class="s">/ى/g</span>, <span class="s">'ي'</span>);        <span class="c">// ألف مقصورة</span>
+}</pre>
+        <p class="muted" style="font-size:.82em">المصدر: <code>src/lib/arabic.ts:14-21</code> (مقتطف). <code>normAr</code> نسخة مفاتيح مختلفة بلا حروف صغيرة — لا تُدمجان.</p>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:.8em">محاولة البحث: كل سجل يُجهَّز <b>مرة</b> في <code>buildHaystacks</code> بتطبيع النص الكامل + النوتات؛ ودخول <code>matches</code> للبحث مجرّد <code>indexOf</code>.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> العرض الحي: اكتب «عود» مرفوعاً ثم مجرداً ثم مشكّلاً — النتائج متطابقة. ثم جرّب «لطافة» (اسم الدار) و«فانيليا» (نوتة).</p>
+    <p>فخّ الاسم الموازي الذي أنشأناه: <code>normAr</code> (مفاتيح بلا lowercase، بمسافات الطي) مقابل <code>norm</code> (لكل بحث). خلطها يكسر مفاتيح SIM الفينقية.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S18 — الموسوعة والمناسبات ═══════════════ -->
+<section class="slide" data-sec="product" aria-label="الموسوعة والمناسبات">
+  <div class="inner">
+    <header>
+      <span class="kicker">تجربة المنتج · تعليم</span>
+      <h2>موسوعة 49 نوتة + وسوم 7 مناسبات</h2>
+    </header>
+    <div class="grid3">
+      <div class="panel">
+        <h4>موسوعة النوتات</h4>
+        <ul class="tick">
+          <li>49 نوتة في 12 مجموعة (خشبية، زهرية، توابل، بوزية…).</li>
+          <li>بطاقة لكل نوتة: أيقونة + اسم + وصف + عدد العطور الحاوية لها.</li>
+          <li>النقر على نوتة يوجّه <code>curNote</code> ويغلق الموسوعة (<code>page.tsx:669-686</code>).</li>
+          <li>نموذج حوار: قفل تمرير الجسم، تركيز على زريّ الإغلاق، إغلاق بـ Esc.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>وسوم المناسبات</h4>
+        <ul class="tick">
+          <li>7 مناسبات: مكتب/صيف/سهرة/موعد/شتاء/مناسبات/يومي.</li>
+          <li>أصل الوسم: قاموس <code>WARDROBE</code> مفتاحه الاسم الإنجليزي (<code>occasions.ts:27-95</code>).</li>
+          <li>فلترة بالشرائح والاختبار يقابلها Q1/Q6 في الدرجات.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>الحساب</h4>
+        <ul class="tick">
+          <li><code>populateNotes()</code> يعدّ التكرارات عبر <code>d.notes.includes(note)</code>.</li>
+          <li><code>applyOccasions</code> يحل وسمًا لكل سجل=人去 <code>en.match(normEn)</code>.</li>
+          <li>عدّ المعاجم إنشائي (<code>WLOOK</code>/<code>SIMN</code>/<code>OVRN</code>) عند الوحدة — لا يبحث في كل render.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٥٠ ثانية.</b> موسوعة النوتات «المفضلة» لأن العدد حقيقي: من الملف، وليست معروضة الأعداد — «عطراً ٠» في الفلاتر فورية.</p>
+    <p>الوصولية هنا عالية المستوى عمداً: <code>role=dialog</code>, <code>aria-modal</code>, وإدارة تركيز يدوية (<code>page.tsx:233-243</code>).</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S19 — تجربة الاختبار ═══════════════ -->
+<section class="slide" data-sec="product" aria-label="الاختبار">
+  <div class="inner">
+    <header>
+      <span class="kicker">تجربة المنتج · الاختبار</span>
+      <h2>بصمتك العطرية: 6 أسئلة ← ملف عطري ← أفضل 5</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>خطوات التجربة</h4>
+        <ul class="tick">
+          <li>6 أسئلة: زمن/مرطبان، عائلة (متعدد قصوى 2)، حضور، نوتات (قصوى 2)، حلاوة، طقس.</li>
+          <li>شريط تقدم + زرّي السابق/التالي (التالي معطّل حتى يُجاب السؤال).</li>
+          <li>النتيجة: اسم بصمة (7 نماذج)، قائمة 5 عطور بدرجة 100-نقطة والأسباب.</li>
+          <li>«شاهده» ← <code>/#p-N</code> يقفز للبطاقة مع وميض <code>flash</code>.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>نموذج أولي للنتيجة</h4>
+        <div class="qrow"><span class="rank">1</span><div><b>لايتون</b><small class="num">Parfums de Marly · Layton</small><br><small class="mut">من عائلة خشبية اخترتها · نوتة تحبها: فانيليا</small></div><span class="sc">92٪</span></div>
+        <div class="qrow"><span class="rank">2</span><div><b>خمرة</b><small class="num">Lattafa · Khamrah</small><br><small class="mut">دافئ ومناسب للشتاء · موسوم لسهرة</small></div><span class="sc">88٪</span></div>
+        <p class="muted" style="font-size:.78em">درجة افتراضية توضيحية — القيم الفعلية تعتمد على إجابات المستخدم (<code>scoring.ts:93-149</code>).</p>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:.8em">التغيير الدلالي المهم: عائلات Q2 تُقرأ من <code>answers[1]</code> (مصفوفة متعددة) لا بمفتاح مسطّح — لأن مفاتيح نوتات Q4 (<code>citrus</code>) تصادف مفاتيح <code>CATS</code>.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> الاختبار «عرضي» كلياً على العميل: <code>getResults(DATA, answers)</code> يقيّم كل الـ 569 في Loop واحد ثم يفرز ويقصّ 5 — بلا شبكة.</p>
+    <p>ذكرالن النقطة الدلالية بثقة: لماذا <code>famsOf</code> يقرأ <code>answers[1]</code> (<code>scoring.ts:24-26</code>): trench من تدقيق سابق.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S20 — التوجيه والتصدير ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="التوجيه">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · التوجيه</span>
+      <h2>ثلاثة مسارات، كلها ساكنة</h2>
+    </header>
+    <pre><span class="c">// next.config.ts:3-9</span>
+<span class="k">const</span> nextConfig: NextConfig = {
+  output: <span class="s">"export"</span>,        <span class="c">// تصدير ثابت — لا خادم Node</span>
+  trailingSlash: <span class="k">true</span>,     <span class="c">// كل مسار ينتهي بـ /</span>
+  images: { unoptimized: <span class="k">true</span> }, <span class="c">// لا محسّن صور على الخادم</span>
+};</pre>
+    <div class="grid3" style="margin-top:1.2rem">
+      <div class="panel"><h4>✔ /</h4><p>فهرس كامل ببطاقات الـ 569. <code>'use client'</code> بالكامل.</p><small class="num">src/app/page.tsx</small></div>
+      <div class="panel"><h4>✔ /quiz/</h4><p>غلاف خادم للميتا + مكوّن تفاعلي <code>QuizClient</code>.</p><small class="num">src/app/quiz/page.tsx</small></div>
+      <div class="panel"><h4>✔ /_not-found</h4><p>صفحة 404 ثابتة تُصدَّر أيضاً.</p><small class="num">out/404.html</small></div>
+    </div>
+    <p class="sub" style="margin-top:1em">نتيجة <code>pnpm build</code> الطازجة في وقت الإعداد: <code>✓ Generating static pages (4/4)</code> — المخرج 3 مسارات ساكنة في <code>out/</code> 3.8MB.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٥٠ ثانية.</b> التصدير <code>export</code> = أي شيء يتطلب الخادم يُرفض في البناء — لا AST، لا API، لا cookies مكتوبة من الخادم. حدوث الصحيح إما ينجح أو يفشل البناء صراحة.</p>
+    <p>أبعاد ل<code>trailingSlash</code>: Next يخدّم الملفات بشريطة عند الاستضافة الثابتة، لذا أجبرنا المطابقة.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S21 — خط أنابيب العرض ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="خط أنابيب العرض">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · العرض</span>
+      <h2>من preredender إلى تفاعلي — صورة موجزة</h2>
+    </header>
+    <div class="flow" style="margin-bottom:1rem">
+      <div class="node hot"><b>بناء Next</b><small>render سكون</small></div><span class="sep">→</span>
+      <div class="node"><b>out/*.html</b><small>HTML كامل</small></div><span class="sep">→</span>
+      <div class="node"><b>استضافة ثابتة</b><small>serve/Hostinger</small></div><span class="sep">→</span>
+      <div class="node"><b>متصفح</b><small>رندر HTML فوراً</small></div><span class="sep">→</span>
+      <div class="node cool"><b>Hydration</b><small>ربط React</small></div>
+    </div>
+    <div class="compare">
+      <div class="panel">
+        <h4>المفاهيم الأربعة بدقة</h4>
+        <ul class="tick">
+          <li><b>SSG:</b> HTML يتولد في زمن البناء، قبل أي مستخدم.</li>
+          <li><b>رندر الخادم</b> (هنا = البناء): إخراج أولي بشجيع مكوّنات، بلا <code>window</code>/<code>localStorage</code>.</li>
+          <li><b>Hydration:</b> ربط React بالشجرة الموجودة وإرفاق معالجات الأحداث — <b>ليس</b> CSR يبدأ DOM فارغاً.</li>
+          <li><b>Effects بعد الالتزام:</b> <code>useEffect</code> بعد الالتزام — يقرأ APIs المتصفح آمن ويحدّث الحالة في render تالٍ.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>ماذا لو خالفنا؟</h4>
+        <p>شجرة الأول الخادم ثم الأول للعميل مختلفة ← تحذير/خطأ، إعادة معالجة الشجرة، أو DOM غير متوقع حسب الإطار.</p>
+        <p class="sub" style="margin-top:.5em">الشرطان الذهبيان لهذا المشروع: أي قراءة Browser API خارج الشجرة الأولى ← بعد المونت، وإبقاء الشجرة الأولى مطابقة للخادم.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٩٠ ثانية.</b> هذه الشريحة تحديداً قبل الغطس الثلاثي للـ Hydration القادم. وضّح ما ليس CSR.</p>
+    <p>الخبرة الحية: html قد يظهر قبل JS — في العرض الحي سنعطل JS في DevTools لترى الصفحة تعمل.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S22 — Hydration 1: ماذا يحسب من ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="هيدريشن 1">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · Hydration (١/٣)</span>
+      <h2>الخادم وما لا يستطيع: آلة الزمن والوقت</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>مثال حي في الكود</h4>
+        <pre><span class="c">// page.tsx:348 — التاريخ في الترويسة</span>
+&lt;time <span class="k">suppressHydrationWarning</span> className=<span class="s">"date"</span>&gt;
+  {today}   <span class="c">// new Date().toLocaleDateString('ar-EG')</span>
+&lt;/time&gt;</pre>
+        <p class="muted" style="font-size:.82em"><code>today</code> يُحسب في <code>page.tsx:333-338</code> — يقرأ <code>Date</code> في زمن البناء (منطقة زمنية الخادم/تاريخ ثابت) بينما رندر العميل الأول يقرأ وقت الزائر الآن.</p>
+      </div>
+      <div class="panel">
+        <h4>اللماذا</h4>
+        <ul class="tick">
+          <li>الخادم (البناء) لا يستطيع الوصول إلى ساعة المستخدم ولا منطقته الزمنية.</li>
+          <li>لو كان اليوم مختلفاً (منتصف ليل) أو المنطقة مختلفة فالرموز النصية تختلف.</li>
+          <li>النتيجة تحدي هيدريشن مشروع — <code>suppressHydrationWarning</code> معترف به للفرق المتعمد لنمط واحد ثابت.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:.8em">قاعدة عامة من الكود: <b>أي قيمة تعتمد على المتصفح تُقرأ بعد المونت</b> — كما تفعل hooks الحالة (التالي)، ولا تُبنى داخل <code>useState</code> الكسول.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٤٥ ثانية.</b> مثال حقيقي غير خيالي: التاريخ المعروض قد يختلف بين رندر البناء ورندر الزائر — حسمتُ بالمشروع <code>suppressHydrationWarning</code> (<code>page.tsx:348</code>).</p>
+    <p>لا يدّعِ أنه بدون مشكلة: نقول «فارق متعمد نمط ثابت، صحيح للعرض غير الحراس» — الزائر يشاهد تاريخ زيارته، لا تاريخ البناء.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S23 — Hydration 2: النمط الخاطئ ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="هيدريشن 2">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · Hydration (٢/٣)</span>
+      <h2>النمط الخاطئ: قراءة localStorage في العرض الأول</h2>
+    </header>
+    <div class="panel" style="margin-bottom:.8em">
+      <span class="badge warn">⚠ نمط خاطئ — غير موجود في المشروع (توضيح)</span>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h4>الكود الذي سيفشل</h4>
+        <pre><span class="k">function</span> <span class="f">useThemeBad</span>() {
+  <span class="k">const</span> [theme, setTheme] = <span class="f">useState</span>(<span class="k">()</span> <span class="k">=&gt;</span> <span class="f">loadTheme</span>());
+  <span class="c">// loadTheme ليستقرأ localStorage —</span>
+  <span class="c">// في البناء: بلا window ← يصدّر 'light'</span>
+  <span class="c">// في الزائر: التحميلَ الأول ← يقرأ 'dark'</span>
+  <span class="k">return</span> [theme, setTheme];
+}</pre>
+      </div>
+      <div class="panel">
+        <h4>ماذا يحدث</h4>
+        <ul class="tick">
+          <li>الخادم أنتج <code>&lt;html class="light"&gt;</code></li>
+          <li>أول رندر للعميل (قبل أي effect) أنتج <code>&lt;html class="dark"&gt;</code></li>
+          <li>قبل اكتمال Hydration الاختلاف ← تحذير <code>text content did not match</code>/ خطأ شجرة.</li>
+          <li>الأسوأ: إعادة بناء DOM تهزّ القيود القابلة لللمس ✓ نقص.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:.8em">الخطأ الجوهري: <b>قراءة متجر خارجي (المتصفح) أثناء الرندر نفسه</b> — الرندر يجب أن يكون دالة نقية في الحالة.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> هذه الشريحة تفرّق بين من يحفظ المدة ومن يحفظ المعنى. مثال theme: <code>localStorage</code> ← «dark» بينما الخادم «light».</p>
+    <p>قل: هذا النمط <b>غير موجود</b> في المشروع كما خطأ؛ uri لا نضع أمثلة وهمية دون إشارة.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S24 — Hydration 3: النمط الآمن في مشروعنا ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="هيدريشن 3">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · Hydration (٣/٣)</span>
+      <h2>النمط الآمن — كما في useFavorites فعلاً</h2>
+    </header>
+    <pre><span class="c">// src/hooks/useFavorites.ts — مقتطف حقيقي</span>
+<span class="k">const</span> [favs, setFavs] =  <span class="f">useState</span>&lt;Set&lt;number&gt;&gt;(<span class="k">new</span> Set());
+<span class="k">const</span> [ready, setReady] = <span class="f">useState</span>(<span class="k">false</span>);
+
+<span class="c">// 1) قراءة المتجر الخارجي بعد المونت فقط</span>
+<span class="f">useEffect</span>(<span class="k">()</span> =&gt; {
+  setFavs(<span class="f">loadFavs</span>());
+  setReady(<span class="k">true</span>);
+}, []);   <span class="c">// ready يحذر الكتابة قبل الاستعادة</span>
+
+<span class="c">// 2) الكتابة المحروسة — لا تمسح القيم المحفوظة</span>
+<span class="f">useEffect</span>(<span class="k">()</span> =&gt; {
+  <span class="k">if</span> (!ready) <span class="k">return</span>;                 <span class="c">// حارس hydration</span>
+  localStorage.setItem(<span class="s">'p100favs'</span>, <span class="f">JSON.stringify</span>(<span class="f">Array.from</span>(favs)));
+}, [ready, favs]);</pre>
+    <div class="grid3" style="margin-top:1rem">
+      <div class="panel"><h4>١. قيمة افتراضية ثابتة</h4><p><code>new Set()</code> — مطابقة الخادم والعميل دائماً في العرض الأول.</p></div>
+      <div class="panel"><h4>٢. قراءة بعد المونت</h4><p><code>loadFavs()</code> في effect — لا في lazy initializer.</p></div>
+      <div class="panel"><h4>٣. حارس ready</h4><p>بدونه ستكتب الدفعة الأولى favs=[] وتمسح الحفظ قبل استعادته (<code>useFavorites.ts:34-41</code>).</p></div>
+    </div>
+    <p class="sub" style="margin-top:.8em">نفس النمط في الحالة: <code>useCatalogState.ts:28-38</code> — INITIAL ثابت، ثم merge للرابط بعد المونت، و <code>ready</code> قبل أي <code>replaceState</code>.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٧٥ ثانية.</b> الأسلوب الثلاثي الذي يُتوقع حفظه حرفياً عند السؤال. <code>useCatalogState.ts:31-33</code> يحوي التعليق نفس معنى السبب.</p>
+    <p>تفصيل «ready» لا يلاحظه غير الخبراء: هو ما يمنع الكتابة قبل الاستعادة مؤقتاً؛ أي إزاحة لو نسيها → مفضلات ممسوحة.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S25 — الحالة: الهاش مصدر الحقيقة ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="الحالة">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · الحالة</span>
+      <h2>الرابط هو «الخادم» الوحيد</h2>
+    </header>
+    <div class="compare">
+      <div class="panel">
+        <h4>تهجين الدول: الحالة في الرابط</h4>
+        <pre><span class="c">// state.ts:31-54 (مقتطف)</span>
+<span class="k">const</span> p: string[] = [];
+<span class="k">if</span> (params.curCat !== <span class="s">'all'</span>) p.push(<span class="s">'cat='</span> + params.curCat);
+<span class="k">if</span> (params.term)      p.push(<span class="s">'q='</span>   + <span class="f">encodeURIComponent</span>(params.term));
+<span class="k">if</span> (params.blindOnly) p.push(<span class="s">'blind=1'</span>);
+<span class="k">if</span> (params.sortMode !== <span class="s">'rank'</span>) p.push(<span class="s">'sort='</span> + params.sortMode);
+<span class="k">return</span> p.length ? <span class="s">'#'</span> + p.join(<span class="s">'&amp;'</span>) : <span class="s">''</span>;</pre>
+      </div>
+      <div class="panel">
+        <h4>صلب التصميم</h4>
+        <ul class="tick">
+          <li>كل تغيير دولة ← <code>saveHash</code> ← <code>history.replaceState</code> (لا سجلات إعادة توجيه).</li>
+          <li>التحميل/الزر الخلفي ← <code>hashchange</code> ← <code>loadState/applyHash</code>.</li>
+          <li><b>تحقق صحة المدخلات</b>: <code>cat</code>∈CATS، <code>sort</code> whitelist، <code>brand</code>∈BRAND_SET، <code>occ</code>∈OCCS، <code>note</code>∈NOTES (<code>state.ts:57-72</code>).</li>
+          <li>روابط عميقة <code>#p-N</code> تُحفظ حتى يغيّر المستخدم فلترة فعلية (<code>useCatalogState.ts:53</code>).</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:.8em">مقايضة صريحة: الرابط يسع 8 مفاتيح بحجم صغير، لا «حالة كاملة قابلة للتعميق الجبري» — المصمم متعمد للوصل.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> لاحظ: <code>replaceState</code> لا يطلق <code>hashchange</code> — لا حلقات ذاتية (<code>useCatalogState.ts:41-42</code> تعليقة).</p>
+    <p>الروابط القابلة للمشاركة: نسخ URL يشارك الفلترة نفسها؛ اختبار التحميل في العرض الحي يؤكده.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S26 — نموذج البيانات ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="نموذج البيانات">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · البيانات</span>
+      <h2>سجل واحد يروي زوجاً كاملاً</h2>
+    </header>
+    <pre><span class="c">// src/data/perfumes.ts — أول سجل (row 27)</span>
+{ c: <span class="s">"woody"</span>, n: <span class="s">"أفينتوس"</span>, en: <span class="s">"Aventus"</span>, br: <span class="s">"Creed"</span>, bar: <span class="s">"كرييد"</span>,
+  notes: [<span class="s">"أناناس"</span>,<span class="s">"كشمش أسود"</span>,<span class="s">"خشب البتولا"</span>,<span class="s">"عنبر"</span>,<span class="s">"مسك"</span>],
+  an: <span class="s">"كلوب دو نوي إنتنس مان"</span>, abr: <span class="s">"Armaf"</span>, abar: <span class="s">"أرماف"</span>,
+  anotes: [<span class="s">"ليمون"</span>,<span class="s">"كشمش أسود"</span>,<span class="s">"بتولا"</span>,<span class="s">"فانيليا"</span>,<span class="s">"مسك"</span>],
+  pf: <span class="s">85</span>, ps: <span class="s">80</span>, af: <span class="s">88</span>, as: <span class="s">85</span>,
+  bl: <span class="k">false</span>, bla: <span class="k">true</span>, rate: <span class="s">4.8</span>, price: <span class="s">"$$$"</span> }</pre>
+    <div class="grid3" style="margin-top:1rem">
+      <div class="panel"><h4>تحريري لا مُحسَّب</h4><p>أسماء/نوتات/درجات/أسعار قيم كتابة يدوية موثقة — المجتمع والأسعار بمصدرها.</p></div>
+      <div class="panel"><h4>مُحسَّب تلقائياً</h4><p><code>occ</code> (من WARDROBE) و <code>sim</code> (SIM+OVR) تُحقن — <b>ممنوع</b> كتابتها يدوياً في السجل.</p></div>
+      <div class="panel"><h4>شبكة جرأة صادقة</h4><p>حقائق: تقييم <code>rate</code>، و<code>bla</code> آمن شراء أعمى (568/569 فقط لا). وصف الأسعار الرمزية <code>$</code>/<code>$$</code>/<code>$$$</code>.</p></div>
+    </div>
+    <p class="sub" style="margin-top:.8em">عدّ معي عند التحقق: عدد السجلات = 569 من <code>perfumes.ts:26</code> حتى <code>:595</code> — أي إضافة تُلحق في النهاية حتى لا تنكسر الفهارس.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> لاحظ القرائن الأربع الصادقة في السجل — جودة البيانات، لا التسويق: نسبة <code>bla=false</code> للأصل في أشهر الأحجار (أفينتوس…)، وأسعار رموزية، وتقييمات جارية بهيكل النقطة.</p>
+    <p>الدقائق: لو سألوا «لماذا <code>rate</code> كسور؟» ← تمزيج تقييمات مجتمع إلى متري تعريفي واحد بلا علم كامل بالنطاق.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S27 — خط أنابيب البحث ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="خط البحث">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · البحث</span>
+      <h2>بحث: من الحرف إلى الحصاد</h2>
+    </header>
+    <div class="flow" style="margin-bottom:1rem">
+      <div class="node hot"><b>norm()</b><small>arabic.ts:14</small></div><span class="sep">→</span>
+      <div class="node"><b>buildHaystacks</b><small>filter.ts:6</small></div><span class="sep">→</span>
+      <div class="node"><b>matches</b><small>filter.ts:17</small></div><span class="sep">→</span>
+      <div class="node cool"><b>sortBy</b><small>sort.ts:5</small></div><span class="sep">→</span>
+      <div class="node cool"><b>visible</b><small>page.tsx:293</small></div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h4>ماذا يُفلتر (معايير 7)</h4>
+        <ul class="tick">
+          <li>العائلة <code>cat</code>، الدار <code>brand</code>، النص المُطبع <code>term</code>.</li>
+          <li>آمن أعمى <code>blindOnly</code>، المفضلة <code>favOnly</code>، المناسبة <code>occ</code>، النوتة <code>note</code>.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>تفصيلة أداء مهمة</h4>
+        <ul class="tick">
+          <li>«دمج» id، نص نهائي لكل سجل مرة واحدة — إعادة استخدام في كل render.</li>
+          <li><code>indexOf</code> بسيط بدل regex: 569 × سطر قصير = يُنسى الأثر.</li>
+          <li>أو «DUMMY» في حالة: <code>favs</code> يُخطئ إلى filter متباً كل مرة في <code>matches</code>.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="muted" style="font-size:.82em;margin-top:.8em">فحص ويمكن التحقق منه بسرعة: <code>matches(i, fs, …)</code> يقبل <code>favs: Set</code> — فلا تُعدَّم بـ «state.term.trim()» في <code>page.tsx:294</code>.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٤٥ ثانية.</b> أفصح أن معلمة البحث <code>indexOf</code> لاحقة (substring) لا حدود كلمات — بحث «عو» سيطابق «عود»؟ لأن الحصيدة تحتوي على «عود». هذه صفة، لا خطأ.</p>
+    <p>مثال «لا تَقع في اختراع regex» — صيانة القيود والتباين المنفرد.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S28 — الترتيب والتشابه ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="الترتيب والتشابه">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · المنطق المحسوب</span>
+      <h2>الترتيب بستة أوضاع، والتشابه بقاموسين</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>sortBy — أصيل وثانوي</h4>
+        <pre><span class="c">// sort.ts:10-19 مقتطف</span>
+<span class="k">if</span> (mode === <span class="s">'rate'</span>)  <span class="k">return</span> B.rate - A.rate;
+<span class="k">if</span> (mode === <span class="s">'pf'</span>)    <span class="k">return</span> B.pf  - A.pf;
+<span class="k">if</span> (mode === <span class="s">'price'</span>) <span class="k">return</span> <span class="f">priceRank</span>(A.price) - <span class="f">priceRank</span>(B.price);
+<span class="k">if</span> (mode === <span class="s">'name'</span>) <span class="k">return</span> A.n.<span class="f">localeCompare</span>(B.n, <span class="s">'ar'</span>);
+<span class="k">return</span> ia - ib;             <span class="c">// rank = الترتيب الأصلي</span></pre>
+        <p class="muted" style="font-size:.82em"><code>localeCompare('ar')</code> — الترتيب الأبجدي العربي لا يتناسب bytes.</p>
+      </div>
+      <div class="panel">
+        <h4>assignScores — SIM + OVR</h4>
+        <ul class="tick">
+          <li>مفتاح SIM: اسم البديل بعد <code>normAr</code> (60 مفتاحاً CR: <code>similarity.ts:5-70</code>).</li>
+          <li>تجاوزات OVR: 119 زوجاً [الاسم الإنجليزي الأصلي + البديل المُطبع] ⇒ دقة إزالة التعارض (<code>similarity.ts:73-200</code>).</li>
+          <li>القيمة الافتراضية 75 bila:<code>scoreOf</code> يُرجع 75 إن لم يوجد مفتاح (<code>similarity.ts:211-214</code>).</li>
+          <li>التوزيع الفعلي وقت الإعداد: <b>توأم 33 · قوي 138 · قريب 203 · روح 195</b>.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:.8em">
+      <span>🎯 توأم موثق ≥ 88</span><span>≈ تطابق قوي 80–87</span><span>◐ قريب 74–79</span><span>🌫 روح مشابهة &lt; 74</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٧٥ ثانية.</b> قلب الدقة: بديلان يشاركان نفس الاسم العربي (مثل «عود مود» لأكثر من زوج) ← OVR يحدد النتيجة لكل زوج بمطابقة [الأصل، البديل] معاً — لولاها كانت أعلى درجة حرة شائعة.</p>
+    <p>التوزيعات أرقام بعدد حقيقي من وقت التحضير؛ لا تقلها من الذاكرة إلا بعد تشغيل أمر node مقابل الملف الحرفي.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S29 — الأداء ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="الأداء">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · الأداء</span>
+      <h2>قرارات أداء بقدر ما تستطيع</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>ما فعلناه</h4>
+        <ul class="tick">
+          <li><b>تهيئة وحدة واحدة</b> للبيانات المحسوبة قبل أي render (<code>page.tsx:18-23</code>, <code>QuizClient.tsx:10</code>).</li>
+          <li><b>buildHaystacks</b> مرة واحدة لكل مصفوفة بيانات.</li>
+          <li><b>useMemo</b> للفلترة/الأقسام/الموسوعة (<code>page.tsx:293-311</code>).</li>
+          <li>خطوط محلية 14 woff2 — مع Google fallback في <code>@font-face</code>.</li>
+          <li>المتجمع الناتج: out/ 3.8MB بالكامل (تشمل الخطوط والصور SVG المولدة).</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>ما لا ندّعي قياسه</h4>
+        <ul class="tick">
+          <li><b>لا Lighthouse/Lab Metrics</b> مدارة حديثاً — لا نقول «fast» بدون رقم.</li>
+          <li>569 بطاقة في طبقة أداء واحدة — بدون virtualization: على أجهزة منخفضة المدى، تكلفة DOM حقيقية.</li>
+          <li>الاختبار يقيّم 569 عطراً × حلقات في إجابات — صفر شبكة لكن حساب متزامن على الـ UI thread.</li>
+          <li>فلاتر أصليّة (OCD ابحث) جاهزة للتحسين اللاحق: الـ memoization يعتمد على شكل javascript، لا قياس.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:.8em">الأمر الأقرب للمعايير في المستودع: <code>pnpm build</code> (وقت compilation ≤ 2.3s محلياً في الإعداد الحالي) — دليل سلوكي لا إعلان SLI.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> الصدق في B القائمة يصحح الأعذار في A. «لا ندّعي قياس» بند إيجابي للخبير — وهو صريح أن البطاقات 569 التجريبية أفقياً بلا upside للتثاقل الافتراضي مقابل ملاحظات ادّعاء.</p>
+    <p>إذا دفعوا سؤال Lighthouse: قل «لم أجعله حداً في العملية، أجري قياساً قبل وبعد أي تعديل أداء وبخط أحادي مكرر» — لا تنسب أرقاماً.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S30 — الأمان ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="الأمان">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · الأمان</span>
+      <h2>سطح هجوم صغير بقدر السكون</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>الذين نحن بخير</h4>
+        <ul class="tick">
+          <li>لا خادم ← لا SQL injection، لا SSRF، لا كشف جلسة، لا API endpoints.</li>
+          <li><b>التحقق من كل مدخل رابط: </b>unknown keys تُمتَحن/تُبطل عند <code>applyHash</code> (<code>state.ts:57-72</code>).</li>
+          <li><b>Robust HTTP parse:</b> <code>decodeURIComponent</code> داخل try/catch (<code>state.ts:20-24</code>).</li>
+          <li><b>localStorage try/catch</b> للوضع الخاص/حصة منتهية (<code>useFavorites.ts:8-11,38-40</code>).</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>طبقات خارجية</h4>
+        <ul class="tick">
+          <li><b>.htaccess</b> مع CSP صارم: <code>default-src 'self'</code>، <code>script-src 'unsafe-inline'</code> (Next inline chunks)، <code>frame-ancestors 'none'</code> (public/.htaccess).</li>
+          <li>رؤوس: <code>X-Content-Type-Options</code>, <code>X-Frame-Options DENY</code>, <code>Referrer-Policy strict-origin-when-cross-origin</code>.</li>
+          <li>Caching: woff2 <code>immutable max-age=1y</code>، HTML بلا تخزين، <code>connect-src 'self'</code> يمنع تسريب الطلبات الخارجية.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:.8em">مقايضة الذيفان: <code>'unsafe-inline'</code> للـ scripts شرط Next static (inline chunks) — مضبوطة المرض عبر ضيق <code>default-src 'self'</code> و stript no else.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٥٠ ثانية.</b> السؤال الخطير الافتتاحي: «أين الكود الحساس؟» الإجابة: مفرغة، أصلاً. ورقة الجولة الأولى من الميزات الأمنية صادقة لأنها تبدأ من لا شيء.</p>
+    <p>لا تقل «fully secure» :) — قل «سطح معروف وضيّق بلا خادم، وطبقة حماية جاهزة في الاستضافة». كل تأكيد يحتاج سطر مصدر.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S31 — الاختبار: ماذا يوجد وماذا لا ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="الاختبار">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · الاختبار</span>
+      <h2>الاختبار — بصراحة تامة</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>ما يوجد فعلاً</h4>
+        <ul class="tick">
+          <li><code>pnpm typecheck</code> (tsc --noEmit) — يمر في الإعداد الحالي.</li>
+          <li><code>pnpm lint</code> (eslint next) — يمر.</li>
+          <li><code>pnpm build</code> — 3 مسارات ساكنة، <code>✓ Compiled</code> في 2.3s.</li>
+          <li>قائمة تحقق <b>يدوية</b> من <code>AGENTS.md</code> (بحث بلا إزالة/بإزالة التشكيل، فلترة، أوامر الستة، تشابه، مسارات الاختبار الخمسة، جوال، ومحاكي سكون).</li>
+          <li>مختبر تحقق اختزالي مع <code>isValid</code> وغيره في مكتبات نقيّة — بُني كي يسهل اختباره.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>ما لا يوجد — بصراحة</h4>
+        <ul class="tick">
+          <li><b>لا test runner</b>: لا <code>pnpm test</code> في package.json، ولا ملف اختبار وحدة.</li>
+          <li>لا E2E كما في Playwright/Cypress.</li>
+          <li>التحقق الوظيفي اليومي يعتمد على القائمة اليدوية والتكافؤ مع الأوراكل.</li>
+        </ul>
+        <p class="sub" style="margin-top:.5em">هذه فجوة معروفة ← عنصر سفلي في خارطة الطريق (اختبار Vitest لمكتبات src/lib النقيّة أولاً).</p>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:.8em">التمييز الذي يريده الجمهور الحقيقي: المنطق النقي معزول (<code>src/lib/*</code> بلا DOM) — إعداد اختبار وحدة لها قرار صغير، ليس إعادة هندسة.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٤٥ ثانية.</b> هذا سؤال شديد الخصوصية: «ما الذي اختُبر فعلًا؟» نعترف فوراً بما لا يوجد. يظهر الباحث عن إشارات false-claim هنا الفرق.</p>
+    <p>لا يصنع Buffer على أن «البناء ناجح» يعني مقبولية كافية؛ اقل: البناء يحرس الأنواع والتركيب، لا السلوك.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S32 — الوصولية ═══════════════ -->
+<section class="slide" data-sec="deep" aria-label="الوصولية">
+  <div class="inner">
+    <header>
+      <span class="kicker">الغوص التقني · الوصولية</span>
+      <h2>وصولية مبنية في المكوّن، لا مورّدها</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>بصمات واضحة</h4>
+        <ul class="tick">
+          <li>رابط تخطٍّ: <code>&lt;a href="#main" class="skip-link"&gt;</code> (<code>page.tsx:342</code>).</li>
+          <li>حوار الفلاتر: <code>role="dialog" aria-label="الفلاتر"</code> + زر ← 📖 موسوعة (محو التفاعل داخل الحوار).</li>
+          <li>الجرد: <code>aria-pressed</code> للشرائح، <code>aria-live="polite"</code> للعدد، <code>role="progressbar"</code> للاختبار.</li>
+          <li>الإغلاق بـ Esc + إدارة التركيز في نموذج الموسوعة (<code>page.tsx:252-261</code>, <code>233-243</code>).</li>
+          <li><code>prefers-reduced-motion</code>: تعطيل كامل للحركة (<code>globals.css:1640-1657</code>) + scrollIntoView/scrollTo بلا smooth (<code>page.tsx:268</code>, <code>646</code>).</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>متى تقف عند الحد</h4>
+        <ul class="tick">
+          <li>الوصولية منقوشة في بنية التدقيق <b>P0-P3</b> (PR #29) — لا طبقة إضافية.</li>
+          <li>لا تقييم تلقائيّ (axe) في pipeline — كُتب يدوياً وقاع tidy.</li>
+          <li>الشاشة بالمفاتيح «✓» منها عبر الروابط/الجرد اليدوي.</li>
+        </ul>
+        <div class="panel hl" style="margin-top:.8em"><h4>رقم ساخن</h4><p>على هاتف ≤760px، زر «⚙ فلترة» يفتح اللوحة وتُغلق بـ ✕ / Esc / النقر خارجها — تمرّ هذه القائمة النهائية في المعاينة.</p></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> قصص الوصولية مقنعة لإعادة الفريق: التخطيط بالكامل في الكود، ولحم الأرقام في مزايا قابلة للهل الحالي.</p>
+    <p>القول الرصين: «على هذا العرض، نقيس يدوياً؛ بدون أداة تلقائية اليوم» — خط الصدق يسعف بـ(الذين يبحثون عن نص خبري).</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S33 — فاصل العرض الحي ═══════════════ -->
+<section class="slide demo" data-sec="demo" aria-label="العرض الحي">
+  <div class="inner">
+    <div class="bottle-svg" aria-hidden="true">
+      <svg viewBox="0 -34 120 200" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#7fb8a6"/><stop offset="1" stop-color="#2c5a4c"/>
+        </linearGradient></defs>
+        <rect x="37" y="32" width="46" height="106" rx="12" fill="url(#g2)" opacity=".18" stroke="#7fb8a6"/>
+        <rect x="51" y="8" width="18" height="26" rx="5" fill="url(#g2)"/>
+        <rect x="55" y="30" width="10" height="30" fill="#2c3b35"/>
+        <rect x="45" y="104" width="30" height="22" rx="4" fill="#eef7f2" opacity=".9"/>
+        <text x="60" y="119" text-anchor="middle" font-size="8" font-weight="700" fill="#1f4a3f" font-family="Tajawal,sans-serif">عطر</text>
+      </svg>
+    </div>
+    <p class="big">العرض <span class="x">الحيّ</span></p>
+    <p class="sub" style="margin:1em auto;max-width:52ch">11 دقيقة بالمسار الحرج، قابلة للضغط إلى 5 — الخطوات مرقّمة ونصوص المحكي ومسارات الفشل كلها في:</p>
+    <p style="margin-top:.8em"><code style="font-size:1em">presentation/demo-script.md</code></p>
+  </div>
+  <aside class="notes">
+    <p><b>افتتاح العرض.</b> اقل ثم افتح المتصفح. لا تصف — نفّذ. الهدف من خرائط العرض: إثبات الخارج ثم الداخل: سلوك ← ملف/سطر.</p>
+    <p>الأوامر: <code>pnpm build</code> ثم <code>npx serve out -l 3001</code> (بديل: <code>python3 -m http.server 3001 -d out</code>).</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S34 — المقايضات ═══════════════ -->
+<section class="slide" data-sec="trade" aria-label="المقايضات">
+  <div class="inner">
+    <header>
+      <span class="kicker">المقايضات</span>
+      <h2>ماذا ربحنا… وماذا دفعنا</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>ربحنا</h4>
+        <ul class="tick">
+          <li>توافق كامل مع أوراكل × تصدير سكوني × أي استضافة.</li>
+          <li>منطق نقي قابل لإعادة الاستخدام والاختبار.</li>
+          <li>روابط حالة قابلة للمشاركة + مفضلات محلية بلا حسابات.</li>
+          <li>صيانة منتظمة رخيصة مقارنة بالملف الواحد.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>دفعنا</h4>
+        <ul class="tick">
+          <li><b>لا تخصيص خلفي:</b> أي ميزة تتطلب خادم (حسابات، تعليقات، Stats) — خارج الحد الآن.</li>
+          <li><b>عقد أوراكل يقبض التغيير:</b> ثبات الترتيب/المفاتيح يبطّئ بعض إعادة البناء.</li>
+          <li><b>انعدام الاختبار التلقائي اليوم</b> يعرض قوانين التوافق لاهتزاز يدوي.</li>
+          <li><b>الفهارس المرتبطة بالمفضلة</b> تحسّسية لأي إعادة ترتيب (عقد توثيقي).</li>
+        </ul>
+      </div>
+    </div>
+    <p class="quote" style="margin-top:1.2rem;text-align:center;font-size:clamp(1.1rem,2.2vw,1.5rem)">القرارات هذه ليست تقصيراً — <span class="x">اختيارات معلنة بثمنها</span>.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> قسم «دفعنا» أهم من «ربحنا» لخبير. أي سؤال «لماذا لا يوجد X؟» يسحب هنا قبل أن نعد خارطة الطريق.</p>
+    <p>لا تصغّر تكلفة الفهارس: «نعلم أن إعادة ترتيب السجلات تكسر مفضلات مخزنة — لذلك الترتيب عقد عام». هذا احترام للنسخة القديمة.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S35 — حدود معروفة ومخاطر ═══════════════ -->
+<section class="slide" data-sec="trade" aria-label="حدود ومخاطر">
+  <div class="inner">
+    <header>
+      <span class="kicker">المقايضات · الصدق</span>
+      <h2>حدود معروفة ومخاطر صريحة</h2>
+    </header>
+    <div class="grid2">
+      <div class="panel">
+        <h4>حدود بيانات</h4>
+        <ul class="tick">
+          <li>«بديل عربي/اقتصادي» لاحقاً لا يعني التطابق مع الأصلي — التشابه 75–95٪ حسب التركيبة (منتجات المنهجية الأصلية في التذييل، page.tsx:624-627).</li>
+          <li>68/569 فقط آمن-أعمى للأصل؛ بعض البدائل ذات — نعرض الحكم بشفافية لا اتصال.</li>
+          <li>350 سجل بديل مقدرة 75 افتراضية (وفق المفتاح) — ليست أزواجاً موثقة سلفاً.</li>
+          <li>تصنيف <code>price</code> رموز نسبية: $$$ لا يساوي مبلغاً — بدون سعر ثابت.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>مخاطر تقنية</h4>
+        <ul class="tick">
+          <li><b>favorites بفهارس:</b> أي تغيير ترتيب يكسّر المفضلة (<code>p100favs</code>).</li>
+          <li><b>أداء الشجرة:</b> 569 بطاقة DOM ثقيلة على أجهزة محدودة بلا virtualization.</li>
+          <li><b>البيانات اليدوية:</b> بدون بوت اختبار توافق دوري، قد تنحرف درجات OVR عن الأزواج عند الإضافة.</li>
+          <li><b>CDN fonts fallback:</b> إن غاب الخط محلياً بسبب استضافة، يتأخر النمط — 14 ملف ثقيل كعك.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:.8em">القاعدة في العرض: <b>ما لا يُحَل أعرفُ من أن أدّعيه</b> — هذا هو دليل الفهم الحقيقي.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> الحدود «المنهجية» أقوى إجابة عن أسئلة الثقة: ذكر النسبة 75–95٪ المذكورة في التذييل بنفس العبارة.</p>
+    <p>عند توزيع الدفعات الجديدة: OVR يتوسع، لذا علينا قبول أن القاموس يضغط بالمتحقَقات لا بالكمال.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S36 — خارطة الطريق بالمخاطر ═══════════════ -->
+<section class="slide" data-sec="roadmap" aria-label="خارطة الطريق">
+  <div class="inner">
+    <header>
+      <span class="kicker">خارطة الطريق</span>
+      <h2>أولويات بالمخاطر، لا قائمة أمنيات</h2>
+    </header>
+    <table>
+      <thead><tr><th>الأولوية</th><th>البند</th><th>بماذا يقلّل</th></tr></thead>
+      <tbody>
+        <tr><td class="n">P0</td><td><b>اختبار وحدة Vitest</b> لـ src/lib (filter/sort/similarity/scoring/state) — المنطق النقي جاهز</td><td>اهتزاز التوافق مع الأوراكل عند كل إضافة</td></tr>
+        <tr><td class="n">P0</td><td><b>اختبار توافق تلقائي</b> بالنتائج المعروفة (بحث/ترتيب/تشابه/ممرات الاختبار الستة)</td><td>تحويل القائمة اليدوية إلى شبكة حراسة</td></tr>
+        <tr><td class="n">P1</td><td><b>E2E دخان</b> (Playwright): فتح / و/quiz، فلترة، حفظ رابط، مفضلة بعد إعادة تحميل</td><td>الانحدار البصري والتفاعلي</td></tr>
+        <tr><td class="n">P1</td><td><b>Virtualization/تدفق للـ 569 بطاقة</b> (content-visibility أو تفريغ IntersectionObserver)</td><td>تكلفة DOM الشجرة على الجوال</td></tr>
+        <tr><td class="n">P2</td><td><b>خدمة الويب: تحليل بيانات مبني</b> (لا يخالف السكون)</td><td>اختيار النوتات بفهم آلي</td></tr>
+        <tr><td class="n">P2</td><td><b>تصدير/استيراد المفضلة</b> +(أيقونة أذواق) — توسعة الخصوصية كاملة</td><td>خسارة المفضلة عند مسح المتصفح</td></tr>
+      </tbody>
+    </table>
+    <p class="sub" style="margin-top:.8em">المنطق: أعلى خطر اليوم = <b>توافق</b> (يدوي + كمّ متزايد) ثم <b>DOM</b> على الأجهزة؛ كلاهما يسبق مزايا المنتج الجديد.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٥٠ ثانية.</b> الرقابة على أوليين P0 ليست أماني بل تخفيض مخاطر محددة. «لماذا الاختبار أولاً؟» → لإن حارساً بالأعلى يقي المستقبل بأقل جهد لأنه يرى 8 مكتبات نقية.</p>
+    <p>لا أعد بـ E2E كامل يحدد العدد — أشير «Playwright دخان فقط» إن كنت ستضيف.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S37 — الخاتمة + الأسئلة ═══════════════ -->
+<section class="slide" data-sec="closing" aria-label="الخاتمة">
+  <div class="inner" style="text-align:center">
+    <span class="kicker" style="justify-content:center">الخاتمة</span>
+    <p class="quote" style="margin:1vh auto">من ملف واحد من 2013 سطراً، صار المنتج <span class="x">بيانات مُرقَّمة</span> تديرها <span class="x">مكتبات نقية</span> ويُصدَّر <span class="x">سكونياً</span> — هذا ما يجعله قابلًا للمساءلة والتحسين.</p>
+    <div class="grid3" style="margin-top:2rem;text-align:start">
+      <div class="panel"><h4>ماذا يشهد العرض</h4><p>تدفق البيانات، وحدود سكونية، وتوافق أوراكل — إنه الشيفرة نفسها، لا مخططاً نظرياً.</p></div>
+      <div class="panel"><h4>الموقف الصريح</h4><p>لا اختبار تلقائي اليوم، والفحوصات اليدوية محفوظة — أُعلنت كفجوة ورُتبت خطوة أولى.</p></div>
+      <div class="panel"><h4>للعودة إلى</h4><p>القرارات بإجاباتها، <code>AGENTS.md</code> عقد المشروع، <code>perfumes.html</code> العقيدة المرجعية.</p></div>
+    </div>
+    <h3 style="margin-top:2rem">أسئلة مفتوحة</h3>
+    <p class="sub" style="margin:auto;max-width:60ch">أبدؤها أنا: «أي جزء تريد أن أفتحه من الكود، كما هو، ونحلل سلوكه معاً؟»</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٦٠ ثانية.</b> الختام جملة واحدة فعلية. ثم افتح الباب: لا تحفظ إجابات محفوظة، افتح الملف وفي خطوات الثلاث (مدخل ← تدفق ← قرار ← مقايضة ← اختبار).</p>
+    <p>دع الجمهور يختار العمق: من «ما يستخدم X؟» إلى «لماذا تلك المتغيرات؟». افتح دائم المصدر وحده.</p>
+  </aside>
+</section>
+
+<!-- ═══════════════ S38 — خريطة الملفات + شكراً ═══════════════ -->
+<section class="slide" data-sec="closing" aria-label="خريطة الحزمة">
+  <div class="inner">
+    <header>
+      <span class="kicker">الملحق</span>
+      <h2>خريطة حزمة العرض</h2>
+    </header>
+    <table>
+      <thead><tr><th>الملف</th><th>وظيفته</th></tr></thead>
+      <tbody>
+        <tr><td><code style="direction:ltr;display:inline-block">slides.html</code></td><td>هذه الشرائح — استعراض مستقل بلا بناء، تنقّل كامل (لوحة + مفاتيح + لمس).</td></tr>
+        <tr><td><code style="direction:ltr;display:inline-block">demo-script.md</code></td><td>سكربت العرض الحي المرقّم، الخطوات ← نصوص المحكي ← مسارات الفشل.</td></tr>
+        <tr><td><code style="direction:ltr;display:inline-block">qa-guide.md</code></td><td>دليل أسئلة الفريق (26–35 سؤالاً): جواب 30–60 ثانية + سطر/مقطع مرجعي.</td></tr>
+        <tr><td><code style="direction:ltr;display:inline-block">README.md</code></td><td>التشغيل، الاختصارات، ترتيب الاستخدام، وقائمة التمرين قبل العرض.</td></tr>
+      </tbody>
+    </table>
+    <p class="sub" style="margin-top:1em">كل رقم في هذه الشرائح مأخوذ من المصدر وقت التحضير، ولا يدّعي بيئة تحقق مختلفة عن ما جرى فعلاً:</p>
+    <div class="tags" style="margin-top:.5em">
+      <span><code>pnpm typecheck</code> ✓</span><span><code>pnpm lint</code> ✓</span>
+      <span><code>pnpm build</code> ✓ (3 مسارات SSR-static × 2.3s)</span>
+    </div>
+    <p class="gold" style="margin-top:1.4rem;font-family:var(--disp);font-size:1.3rem;text-align:center">شكراً لوقتكم — والأسئلة تُفتح من المصدر.</p>
+  </div>
+  <aside class="notes">
+    <p><b>≈ ٤٠ ثانية.</b> لقطة أخيرة للفريق خبير: من الوشارة إلى الملفات. إن أسئِلتك ظلت بعد الصيانة، جهّز خارطة الطريق.</p>
+    <p>حزمة باسم <code>presentation/</code> — تعمل محلياً بلا أي خادم.</p>
+  </aside>
+</section>
+
+<!-- ====== chrome ====== -->
+<aside id="overlay" aria-label="فهرس الشرائح">
+  <button class="close" aria-label="إغلاق الفهرس">✕ إغلاق</button>
+  <h3>فهرس الشرائح</h3>
+  <div id="index-grid"></div>
+</aside>
+
+<div class="controls" role="toolbar" aria-label="أدوات العرض">
+  <div class="group">
+    <span id="sectag"></span>
+    <span class="counter" id="counter">0/0</span>
+  </div>
+  <div class="group">
+    <button class="btn" id="btn-prev" aria-label="الشريحة السابقة">→ السابق</button>
+    <button class="btn" id="btn-notes" aria-label="تشغيل ملاحظات المتحدث">📋 الملاحظات</button>
+    <button class="btn" id="btn-index" aria-label="عرض الفهرس">≡ الفهرس</button>
+    <button class="btn" id="btn-full" aria-label="ملء الشاشة">⛶</button>
+    <button class="btn" id="btn-next" aria-label="الشريحة التالية">التالي ←</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var counterEl = document.getElementById("counter");
+  var sectagEl = document.getElementById("sectag");
+  var progress = document.getElementById("progress");
+  var overlay = document.getElementById("overlay");
+  var idx = 0;
+
+  var SECTION_LABEL = {
+    opening:"الافتتاح", thesis:"الأطروحة", decisions:"رحلة القرارات",
+    model:"النموذج الذهني", product:"تجربة المنتج", deep:"الغوص التقني",
+    demo:"العرض الحيّ", trade:"المقايضات", roadmap:"خارطة الطريق", closing:"الخاتمة"
+  };
+
+  function paint(){
+    slides.forEach(function(s,i){ s.classList.toggle("on", i===idx); });
+    counterEl.textContent = (idx+1)+"/"+slides.length;
+    sectagEl.textContent = SECTION_LABEL[slides[idx].dataset.sec] || "";
+    progress.style.width = ((idx+1)/slides.length*100)+"%";
+    var p = slides[idx].querySelector("aside.notes");
+    if(p) p.classList.remove("open");
+    document.getElementById("btn-prev").setAttribute("aria-disabled", idx===0 ? "true":"false");
+    document.getElementById("btn-next").setAttribute("aria-disabled", idx===slides.length-1 ? "true":"false");
+    try{ history.replaceState(null,"","#s"+(idx+1)); }catch(e){}
+  }
+  function go(n){
+    idx = Math.max(0, Math.min(slides.length-1, n));
+    paint();
+    slides[idx].scrollTop = 0;
+  }
+  function toggleNotes(force){
+    var n = slides[idx].querySelector("aside.notes");
+    if(!n) return;
+    if(force === undefined) n.classList.toggle("open");
+    else n.classList.toggle("open", force);
+  }
+
+  // ==== index grid ====
+  var grid = document.getElementById("index-grid");
+  slides.forEach(function(s,i){
+    var b = document.createElement("button");
+    b.type = "button";
+    var t = s.querySelector("h1, h2");
+    var n = document.createElement("span");
+    n.textContent = (i+1);
+    var b2 = document.createElement("span");
+    b2.textContent = t ? t.textContent : ("شريحة "+(i+1));
+    b.appendChild(n);
+    b.appendChild(b2);
+    b.addEventListener("click", function(){ go(i); closeOverlay(); });
+    grid.appendChild(b);
+  });
+  function openOverlay(){ overlay.classList.add("open"); grid.lastElementChild && grid.lastElementChild.focus(); }
+  function closeOverlay(){ overlay.classList.remove("open"); }
+  overlay.querySelector(".close").addEventListener("click", closeOverlay);
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeOverlay(); });
+
+  // ==== nav ====
+  document.getElementById("btn-next").addEventListener("click", function(){ go(idx+1); });
+  document.getElementById("btn-prev").addEventListener("click", function(){ go(idx-1); });
+  document.getElementById("btn-notes").addEventListener("click", function(){ toggleNotes(); });
+  document.getElementById("btn-index").addEventListener("click", function(){ openOverlay(); });
+  document.getElementById("btn-full").addEventListener("click", function(){
+    if(document.fullscreenElement){ document.exitFullscreen(); }
+    else{ document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(function(){}); }
+  });
+
+  // keyboard (RTL: → سابق, ← تالي; we map position-agnostic)
+  document.addEventListener("keydown", function(e){
+    if(overlay.classList.contains("open")){
+      if(e.key === "Escape"){ closeOverlay(); }
+      return;
+    }
+    switch(e.key){
+      case "ArrowLeft":  case "ArrowDown": case "PageDown": case " ": e.preventDefault(); go(idx+1); break;
+      case "ArrowRight": case "ArrowUp":   case "PageUp":    e.preventDefault(); go(idx-1); break;
+      case "Home": e.preventDefault(); go(0); break;
+      case "End":  e.preventDefault(); go(slides.length-1); break;
+      case "f": case "F": document.getElementById("btn-full").click(); break;
+      case "n": case "N": toggleNotes(); break;
+      case "i": case "I": case "g": case "G": openOverlay(); break;
+      case "Escape": toggleNotes(false); closeOverlay(); break;
+    }
+  });
+
+  // touch swipe (RTL: swipe left → next)
+  var tx=0, ty=0;
+  document.addEventListener("touchstart", function(e){
+    tx = e.changedTouches[0].clientX; ty = e.changedTouches[0].clientY;
+  }, {passive:true});
+  document.addEventListener("touchend", function(e){
+    var dx = e.changedTouches[0].clientX - tx;
+    var dy = e.changedTouches[0].clientY - ty;
+    if(Math.abs(dx) < 48 || Math.abs(dy) > Math.abs(dx)*1.6) return;
+    if(dx < 0) go(idx+1); else go(idx-1);
+  }, {passive:true});
+
+  // deep link #sN
+  var m = /#s(\d+)/.exec(location.hash);
+  if(m) go(parseInt(m[1],10)-1);
+
+  paint();
+})();
+</script>
+</body>
+</html>
